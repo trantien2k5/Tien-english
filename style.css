@@ -519,3 +519,41 @@ input[type="password"] {
     40% {transform: translateY(-5px);}
     60% {transform: translateY(-3px);}
 }
+
+.achievement-card {
+    transition: transform 0.3s ease;
+}
+
+.achievement-card:hover {
+    transform: translateY(-5px); /* Bay nhẹ khi di chuột vào */
+}
+
+.stat-box {
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.stat-box:hover {
+    border-color: var(--primary);
+    background: white !important;
+    box-shadow: var(--shadow);
+}
+
+.achievement-card {
+    transition: transform 0.3s ease;
+}
+
+.achievement-card:hover {
+    transform: translateY(-5px); /* Bay nhẹ khi di chuột vào */
+}
+
+.stat-box {
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.stat-box:hover {
+    border-color: var(--primary);
+    background: white !important;
+    box-shadow: var(--shadow);
+}

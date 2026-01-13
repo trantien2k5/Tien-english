@@ -92,22 +92,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 6. KHO TỪ VỰNG (TAB 3) ---
     // Thay thế hàm saveToLibrary để hỗ trợ cá nhân hóa lâu dài
     window.saveToLibrary = (word, meaning) => {
-    let library = JSON.parse(localStorage.getItem('MY_VOCAB') || '[]');
-    if (!library.some(item => item.w === word)) {
-        library.unshift({ 
-            w: word, 
-            m: meaning, 
-            date: new Date().toISOString(),
-            box: 1, // Hộp 1: Mới học -> Hộp 5: Đã thuộc lòng
-            nextReview: Date.now() // Cần học ngay
-        });
-        localStorage.setItem('MY_VOCAB', JSON.stringify(library));
-        showToast(`🚀 Đã thêm "${word}" vào lộ trình học!`);
-        updateProgressTab(); 
-    } else { 
-        showToast("Từ này đã có trong danh sách.", "warning"); 
-    }
-};
+        let library = JSON.parse(localStorage.getItem('MY_VOCAB') || '[]');
+        if (!library.some(item => item.w === word)) {
+            library.unshift({
+                w: word,
+                m: meaning,
+                date: new Date().toISOString(),
+                box: 1, // Hộp 1: Mới học -> Hộp 5: Đã thuộc lòng
+                nextReview: Date.now() // Cần học ngay
+            });
+            localStorage.setItem('MY_VOCAB', JSON.stringify(library));
+            showToast(`🚀 Đã thêm "${word}" vào lộ trình học!`);
+            updateProgressTab();
+        } else {
+            showToast("Từ này đã có trong danh sách.", "warning");
+        }
+    };
 
     window.renderSavedVocab = () => {
         const display = document.getElementById('vocabListDisplay');
@@ -130,16 +130,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- 7. CÁC HÀM TRỢ GIÚP ---
 
-async function callAI(key, topic, mode, level) {
+// Thay thế hàm callOpenAI hiện tại
+async function callOpenAI(key, topic, mode, level) {
     const url = "https://api.openai.com/v1/chat/completions";
     const prompt = `Act as an English Teacher. Topic: "${topic}", Level: ${level}, Mode: ${mode}. 
-    Output JSON ONLY: {"title":"","content":"","audioText":"","grammarPoint":"","vocab":[{"w":"","m":"","usage":""}],"quiz":{"q":"","o":[],"ai":0,"e":""}}`;
+    Return JSON ONLY: {"title":"","content":"","audioText":"","grammarPoint":"","vocab":[{"w":"","m":"","usage":""}],"quiz":{"q":"","o":[],"ai":0,"e":""}}`;
 
     const res = await fetch(url, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${key}`
+        headers: { 
+            'Content-Type': 'application/json', 
+            'Authorization': `Bearer ${key}` 
         },
         body: JSON.stringify({
             model: "gpt-4o-mini",
@@ -148,8 +149,16 @@ async function callAI(key, topic, mode, level) {
         })
     });
 
-    if (!res.ok) throw new Error("API Key OpenAI không hợp lệ hoặc hết hạn.");
+    if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error?.message || "Lỗi kết nối OpenAI");
+    }
+
     const json = await res.json();
+    
+    // Ghi nhật ký sử dụng sau khi thành công (ước tính 800 tokens cho bài học)
+    logApiUsage(800); 
+    
     return JSON.parse(json.choices[0].message.content);
 }
 
@@ -189,7 +198,7 @@ function renderLesson(data) {
 async function callAIForTalk(userInput) {
     const key = localStorage.getItem('OPENAI_KEY');
     const url = "https://api.openai.com/v1/chat/completions";
-    
+
     const res = await fetch(url, {
         method: 'POST',
         headers: {
@@ -201,7 +210,7 @@ async function callAIForTalk(userInput) {
             messages: [{ role: "user", content: `English friend chat (max 2 sentences). Correct grammar if needed: "${userInput}"` }]
         })
     });
-    
+
     const json = await res.json();
     return json.choices[0].message.content;
 }
@@ -209,10 +218,10 @@ async function callAIForTalk(userInput) {
 function initSpeechRecognition(el) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) { el.speechStatus.innerText = "Trình duyệt không hỗ trợ Mic."; return; }
-    
+
     const rec = new SpeechRecognition();
     rec.lang = 'en-US';
-    let isStarted = false; // Biến cờ hiệu kiểm soát trạng thái
+    let isStarted = false;
 
     el.micBtn.onmousedown = () => {
         if (!isStarted) {
@@ -231,15 +240,17 @@ function initSpeechRecognition(el) {
             el.micBtn.classList.remove('recording');
         }
     };
-
+    
+    // Tích hợp logApiUsage vào kết quả trả về
     rec.onresult = async (e) => {
         const txt = e.results[0][0].transcript;
         addMsg("You", txt);
         try {
             const res = await callAIForTalk(txt);
+            logApiUsage(150); // Luyện nói tốn ít token hơn
             addMsg("AI", res);
             speak(res);
-        } catch (err) { addMsg("System", "Lỗi AI."); }
+        } catch (err) { addMsg("System", "Lỗi hội thoại."); }
     };
 }
 
@@ -261,16 +272,16 @@ let currentIdx = 0;
 function initFlashcards() {
     const allVocab = JSON.parse(localStorage.getItem('MY_VOCAB') || '[]');
     const now = Date.now();
-    
+
     // Lọc từ đến hạn ôn tập
     const reviewData = allVocab.filter(item => !item.nextReview || item.nextReview <= now);
-    
+
     if (reviewData.length === 0) {
         document.getElementById('card-word').innerText = "🎉 Hoàn thành!";
         document.getElementById('card-meaning').innerText = "Bạn đã ôn hết từ cần thiết cho hôm nay.";
         return;
     }
-    
+
     currentIdx = 0;
     showCard(reviewData, 0);
 
@@ -297,53 +308,80 @@ function showCard(data, idx) {
 function updateProgressTab() {
     const library = JSON.parse(localStorage.getItem('MY_VOCAB') || '[]');
     const stats = JSON.parse(localStorage.getItem('USER_STATS') || '{"xp":0, "level":1}');
-    
-    // Cập nhật số từ
+    const apiLogs = JSON.parse(localStorage.getItem('API_USAGE_LOGS') || '{"calls": 0, "tokens": 0, "last": "Chưa có"}');
+
+    // 1. Cập nhật số từ và Streak
     document.getElementById('stat-vocab-count').innerText = library.length;
     
-    // Cập nhật XP và Level
+    // 2. Cập nhật XP và Level
     document.getElementById('display-level').innerText = stats.level;
     const xpNeeded = stats.level * 100;
     const xpPct = (stats.xp % xpNeeded) / xpNeeded * 100;
     document.getElementById('xp-bar').style.width = xpPct + "%";
-    
-    // Danh hiệu dựa trên cấp độ
-    const ranks = ["Tập sự", "Cần cù", "Thông thái", "Bậc thầy", "Huyền thoại"];
-    document.getElementById('display-rank').innerText = ranks[Math.min(Math.floor(stats.level/5), 4)];
+    document.getElementById('xp-text').innerText = `${stats.xp % xpNeeded}/${xpNeeded} XP để lên cấp`;
+
+    // 3. Cập nhật Danh hiệu
+    const ranks = ["TÂN BINH", "CẦN CÙ", "THÔNG THÁI", "BẬC THẦY", "HUYỀN THOẠI"];
+    document.getElementById('display-rank').innerText = ranks[Math.min(Math.floor(stats.level / 5), 4)];
+
+    // 4. Cập nhật Thống kê API
+    if (document.getElementById('api-call-count')) {
+        document.getElementById('api-call-count').innerText = apiLogs.calls;
+        document.getElementById('api-token-est').innerText = apiLogs.tokens.toLocaleString();
+        document.getElementById('api-last-call').innerText = apiLogs.last;
+    }
+
+    // 5. Kiểm tra trạng thái kết nối
+    const statusEl = document.getElementById('api-status');
+    const key = localStorage.getItem('OPENAI_KEY');
+    if (statusEl) {
+        statusEl.innerText = key ? "Sẵn sàng" : "Chưa có Key";
+        statusEl.style.color = key ? "#16a34a" : "#dc2626";
+    }
 }
 
 function handleReviewResult(wordObj, isRemembered) {
     let library = JSON.parse(localStorage.getItem('MY_VOCAB') || '[]');
     const index = library.findIndex(i => i.w === wordObj.w);
-    
+
     if (index !== -1) {
         if (isRemembered) {
             library[index].box = Math.min(library[index].box + 1, 5);
         } else {
             library[index].box = 1; // Quên thì về hộp 1
         }
-        
+
         // Công thức tính thời gian: Hộp 1: 1 ngày, Hộp 2: 3 ngày, Hộp 3: 7 ngày, Hộp 4: 15 ngày...
-        const intervals = [0, 1, 3, 7, 15, 30]; 
+        const intervals = [0, 1, 3, 7, 15, 30];
         const nextDays = intervals[library[index].box];
         library[index].nextReview = Date.now() + (nextDays * 24 * 60 * 60 * 1000);
-        
+
         localStorage.setItem('MY_VOCAB', JSON.stringify(library));
         addXP(10); // Tặng 10 XP khi ôn tập
     }
 }
 
-// 4. Hệ thống XP (Gamification)
+// Hàm ghi lại lịch sử sử dụng API
+function logApiUsage(estimatedTokens = 500) {
+    let apiLogs = JSON.parse(localStorage.getItem('API_USAGE_LOGS') || '{"calls": 0, "tokens": 0, "last": ""}');
+    apiLogs.calls += 1;
+    apiLogs.tokens += estimatedTokens;
+    apiLogs.last = new Date().toLocaleTimeString();
+    localStorage.setItem('API_USAGE_LOGS', JSON.stringify(apiLogs));
+}
+
+// Hệ thống XP (Gamification)
 function addXP(amount) {
     let stats = JSON.parse(localStorage.getItem('USER_STATS') || '{"xp":0, "level":1}');
     stats.xp += amount;
     if (stats.xp >= stats.level * 100) {
         stats.level++;
-        showToast(`🎊 Chúc mừng! Bạn đã lên cấp ${stats.level}!`, "success");
+        if(typeof showToast === 'function') showToast(`🎊 Chúc mừng! Bạn đã lên cấp ${stats.level}!`, "success");
     }
     localStorage.setItem('USER_STATS', JSON.stringify(stats));
     updateProgressTab();
 }
+
 
 window.speak = (text) => {
     window.speechSynthesis.cancel();

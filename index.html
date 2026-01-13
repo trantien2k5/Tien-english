@@ -178,6 +178,35 @@
                     </div>
                 </div>
 
+                <div class="card api-stats" style="margin-top: 20px; border: 1px solid #fee2e2; background: #fffafb;">
+                    <h4 style="margin-bottom: 15px; color: #991b1b; display: flex; align-items: center; gap: 8px;">
+                        🔌 Thống kê OpenAI API
+                    </h4>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="background: white; padding: 10px; border-radius: 10px; border: 1px solid #fecaca;">
+                            <p style="font-size: 0.7rem; color: #7f1d1d; font-weight: bold;">SỐ LẦN GỌI</p>
+                            <h3 id="api-call-count" style="color: #b91c1c; margin: 5px 0;">0</h3>
+                        </div>
+                        <div style="background: white; padding: 10px; border-radius: 10px; border: 1px solid #fecaca;">
+                            <p style="font-size: 0.7rem; color: #7f1d1d; font-weight: bold;">TOKEN ƯỚC TÍNH</p>
+                            <h3 id="api-token-est" style="color: #b91c1c; margin: 5px 0;">0</h3>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top: 15px; font-size: 0.8rem; color: #450a0a; border-top: 1px dashed #fecaca; padding-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Trạng thái:</span>
+                            <span id="api-status" style="font-weight: bold; color: #16a34a;">Sẵn sàng</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Lần cuối:</span>
+                            <span id="api-last-call" style="font-style: italic; color: #64748b;">Chưa có dữ liệu</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="badges-section">
                     <h4 style="margin-bottom: 12px; font-size: 0.9rem;">Huy hiệu vinh danh</h4>
                     <div id="badge-container" style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -224,7 +253,8 @@
         </a>
     </nav>
 
-    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; pointer-events: none;">
+    </div>
 
     <script src="script.js"></script>
 </body>
