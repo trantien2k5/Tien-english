@@ -1,1 +1,55 @@
-/* Listening styles */
+/* Speed Control */
+.speed-control {
+    display: flex; justify-content: center; gap: 15px;
+    font-size: 0.9rem; color: var(--color-text-muted);
+}
+.speed-control label { cursor: pointer; display: flex; align-items: center; gap: 5px; }
+
+/* Transcript Box */
+.transcript-box { text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 20px; margin-top: 20px; }
+
+/* Quiz Styles */
+.quiz-item { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+.quiz-item:last-child { border-bottom: none; }
+
+.quiz-question { font-weight: 700; margin-bottom: 12px; color: var(--color-text-main); }
+
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+
+.option-btn {
+    text-align: left;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.option-btn:hover { border-color: var(--color-primary); background: #eef2ff; }
+
+/* Trạng thái Đúng/Sai */
+.option-btn.correct {
+    background-color: #dcfce7 !important; /* Xanh lá nhạt */
+    border-color: #22c55e !important;
+    color: #15803d;
+}
+
+.option-btn.wrong {
+    background-color: #fee2e2 !important; /* Đỏ nhạt */
+    border-color: #ef4444 !important;
+    opacity: 0.7;
+}
+
+/* Giải thích đáp án */
+.quiz-explain {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 10px;
+    border-radius: 8px;
+    display: none; /* Ẩn mặc định */
+}
+.quiz-explain strong { color: var(--color-primary); }

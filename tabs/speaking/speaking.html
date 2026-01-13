@@ -1,26 +1,63 @@
 <div class="page-header">
-    <h2 class="page-header__title">Luyện Nói 🎤</h2>
-    <p class="page-header__desc">AI sẽ kiểm tra ngữ pháp giúp bạn</p>
+    <h2 class="page-header__title">Speaking Coach 🎙️</h2>
+    <p class="page-header__desc">Nói tự nhiên, AI sẽ sửa lỗi từng từ cho bạn</p>
 </div>
 
-<div class="card" style="text-align: center; padding: 40px 20px;">
-    <button id="btn-record" class="btn btn--primary btn--circle">
-        🎙️
-    </button>
-    <p id="status-text" style="margin-top: 15px; font-weight: 500;">Nhấn để nói...</p>
+<div class="card" id="record-area" style="text-align: center; padding: 40px 20px;">
     
-    <div id="wave-animation" class="wave-container" style="display:none">
+    <div class="mic-wrapper">
+        <button id="btn-record" class="btn btn--primary btn--circle">
+            🎙️
+        </button>
+        <div id="mic-pulse" class="pulse-ring"></div>
+    </div>
+
+    <p id="status-text" style="margin-top: 20px; font-weight: 600; color: var(--color-text-muted);">
+        Nhấn để bắt đầu nói...
+    </p>
+
+    <div id="wave-animation" class="wave-container" style="display:none; margin-top: 20px;">
         <span></span><span></span><span></span><span></span><span></span>
     </div>
 </div>
 
-<div class="card">
-    <h3>Kết quả:</h3>
-    <p id="user-transcript" style="font-style: italic; color: #555;">(Chưa có dữ liệu)</p>
+<div id="result-area" style="display: none;">
     
-    <div id="ai-feedback-box" style="display:none">
-        <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
-        <h4>🤖 AI Phân tích:</h4>
-        <div id="ai-content" class="ai-response"></div>
+    <div class="card score-card">
+        <div class="score-circle">
+            <span id="score-number">0</span>
+            <small>/10</small>
+        </div>
+        <div class="score-text">
+            <h3 id="score-title">Đang chấm...</h3>
+            <p id="score-comment">AI đang phân tích giọng nói của bạn</p>
+        </div>
     </div>
+
+    <div class="card">
+        <h3>🔍 Chi tiết lỗi sai</h3>
+        <div class="feedback-box">
+            <p class="label">Bạn đã nói:</p>
+            <div id="user-transcript-html" class="transcript-display">
+                </div>
+            
+            <div class="correction-arrow">⬇️ Nên sửa thành:</div>
+            
+            <div id="corrected-text" class="transcript-display correct">
+                </div>
+        </div>
+
+        <div id="error-list" class="error-details">
+            </div>
+    </div>
+
+    <div class="card" style="background: linear-gradient(to right, #f8fafc, #f1f5f9);">
+        <h3>✨ Cách nói tự nhiên hơn (Native Speaker)</h3>
+        <ul id="suggestion-list" class="native-suggestions">
+            </ul>
+    </div>
+
+    <button id="btn-retry" class="btn btn--outline" style="margin-top: 10px;">
+        🔄 Thử lại
+    </button>
 </div>

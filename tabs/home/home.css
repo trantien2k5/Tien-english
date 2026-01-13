@@ -1,0 +1,249 @@
+/* --- Page Header --- */
+.page-header__title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    /* Hiệu ứng chữ gradient */
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* --- 1. LEVEL CARD (Thẻ VIP) --- */
+.level-card {
+    /* Gradient chéo xịn xò */
+    background: linear-gradient(120deg, #6366f1, #a855f7, #ec4899);
+    background-size: 200% 200%;
+    animation: gradientShift 10s ease infinite; /* Gradient chuyển động nhẹ */
+    color: white;
+    box-shadow: 0 20px 30px -10px rgba(99, 102, 241, 0.5);
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hiệu ứng nền chuyển động */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Họa tiết trang trí mờ ở nền thẻ */
+.level-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.level-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.level-badge {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px); /* Hiệu ứng kính mờ */
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: inline-block;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.level-info h3 {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.level-icon {
+    font-size: 3rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* Thanh tiến độ xịn hơn */
+.progress-bar-bg {
+    background: rgba(0, 0, 0, 0.25);
+    height: 12px; /* Dày hơn */
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+.progress-bar-fill {
+    background: linear-gradient(90deg, #fbbf24, #f59e0b); /* Gradient vàng */
+    height: 100%;
+    border-radius: 20px;
+    transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1); /* Chuyển động rất mượt */
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); /* Phát sáng nhẹ */
+}
+
+/* --- 2. STATS GRID (Lưới chỉ số hiện đại) --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: var(--spacing-md);
+}
+
+.stat-item {
+    /* Ghi đè style card mặc định */
+    margin-bottom: 0;
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column; /* Xếp dọc trên mobile */
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Tạo bong bóng màu nền cho icon */
+.stat-icon-wrapper {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+/* Màu riêng cho từng loại icon */
+.stat-item.fire .stat-icon-wrapper { background: rgba(245, 158, 11, 0.15); color: var(--color-warning); }
+.stat-item.time .stat-icon-wrapper { background: rgba(59, 130, 246, 0.15); color: var(--color-info); }
+.stat-item.book .stat-icon-wrapper { background: rgba(16, 185, 129, 0.15); color: var(--color-success); }
+
+.stat-data h4 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin-bottom: 2px;
+}
+.stat-data span {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+
+/* --- 3. TIP CARD --- */
+.tip-card {
+    background: #fffbeb; /* Nền vàng rất nhạt */
+    border-left: 6px solid var(--color-warning);
+}
+.tip-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #92400e; /* Màu chữ nâu vàng */
+    margin-bottom: 10px;
+}
+
+/* --- DAILY PLAN CARD --- */
+.daily-plan-card {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+}
+
+.plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.plan-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin-bottom: 5px;
+}
+.plan-subtitle { font-size: 0.9rem; color: var(--color-text-muted); }
+
+/* Task List */
+.task-list { display: flex; flex-direction: column; gap: 12px; }
+
+.task-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 12px;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.task-item:hover { background: #f1f5f9; }
+
+.task-item.completed {
+    background: #f0fdf4; /* Xanh lá nhạt */
+    border-color: #bbf7d0;
+}
+.task-item.completed .task-icon { background: #22c55e; color: white; }
+.task-item.completed .btn-action {
+    background: transparent; color: #16a34a; cursor: default;
+    box-shadow: none;
+}
+
+.task-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 1.2rem;
+    margin-right: 15px;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.task-icon.vocab { color: #3b82f6; }
+.task-icon.listen { color: #f59e0b; }
+.task-icon.speak { color: #ef4444; }
+
+.task-info { flex: 1; }
+.task-info h4 { font-size: 0.95rem; font-weight: 700; color: var(--color-text-main); }
+.task-info span { font-size: 0.8rem; color: var(--color-text-muted); }
+
+.btn-action {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: none;
+    background: var(--color-text-main); /* Màu đen nổi bật */
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-action:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+/* Circular Progress Chart (CSS Pure) */
+.plan-chart { position: relative; width: 50px; height: 50px; }
+.circular-chart { display: block; margin: 0 auto; max-width: 80%; max-height: 250px; }
+.circle-bg { fill: none; stroke: #eee; stroke-width: 3.8; }
+.circle { fill: none; stroke-width: 2.8; stroke-linecap: round; animation: progress 1s ease-out forwards; stroke: var(--color-primary); transition: stroke-dasharray 0.5s ease; }
+#percent-text {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.75rem; font-weight: 800; color: var(--color-primary);
+}

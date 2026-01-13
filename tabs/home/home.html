@@ -1,12 +1,102 @@
 <div class="page-header">
     <h2 class="page-header__title">Xin chào, Student! 👋</h2>
-    <p class="page-header__desc">Hôm nay bạn muốn học gì?</p>
+    <p class="page-header__desc">Kế hoạch 10 phút để giỏi tiếng Anh mỗi ngày</p>
 </div>
-<div class="card" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white;">
-    <h3>WordStock Progress</h3>
-    <p style="opacity: 0.9; margin-top: 5px;">Bạn đang phát triển rất tốt!</p>
+
+<div class="card daily-plan-card">
+    <div class="plan-header">
+        <div>
+            <h3 class="plan-title">📅 Kế hoạch hôm nay</h3>
+            <p class="plan-subtitle">Hoàn thành: <span id="plan-progress">0/3</span> nhiệm vụ</p>
+        </div>
+        <div class="plan-chart">
+            <svg viewBox="0 0 36 36" class="circular-chart orange">
+                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path id="circle-path" class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <span id="percent-text">0%</span>
+        </div>
+    </div>
+
+    <div class="task-list">
+        <div class="task-item" id="task-vocab">
+            <div class="task-icon vocab">📚</div>
+            <div class="task-info">
+                <h4>Ôn 10 từ vựng</h4>
+                <span>5 phút • Flashcard</span>
+            </div>
+            <button class="btn-action" onclick="window.startTask('vocab')">Bắt đầu</button>
+        </div>
+
+        <div class="task-item" id="task-listen">
+            <div class="task-icon listen">🎧</div>
+            <div class="task-info">
+                <h4>Nghe 1 bài hội thoại</h4>
+                <span>3 phút • Comprehension</span>
+            </div>
+            <button class="btn-action" onclick="window.startTask('listening')">Bắt đầu</button>
+        </div>
+
+        <div class="task-item" id="task-speak">
+            <div class="task-icon speak">🎙️</div>
+            <div class="task-info">
+                <h4>Luyện nói 1 câu</h4>
+                <span>2 phút • AI Check</span>
+            </div>
+            <button class="btn-action" onclick="window.startTask('speaking')">Bắt đầu</button>
+        </div>
+    </div>
 </div>
-<div class="card">
-    <h3>Mẹo hôm nay 💡</h3>
-    <p>Để học Java tốt, hãy thử viết lại các thuật toán cơ bản bằng Java thay vì chỉ đọc lý thuyết.</p>
+
+<div class="card level-card">
+    <div class="level-info">
+        <div>
+            <span class="level-badge">Level A2</span>
+            <h3>Sơ cấp (Elementary)</h3>
+        </div>
+        <div class="level-icon">🏆</div>
+    </div>
+    <div class="progress-container">
+        <div class="progress-labels">
+            <span>EXP: 340/500</span>
+            <span>68%</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" style="width: 68%;"></div>
+        </div>
+        <p class="level-note">Cần 160 EXP nữa để lên <b>Level B1</b></p>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="card stat-item fire">
+        <div class="stat-icon-wrapper">🔥</div>
+        <div class="stat-data">
+            <h4 id="user-streak">0</h4>
+            <span>Ngày Streak</span>
+        </div>
+    </div>
+
+    <div class="card stat-item time">
+        <div class="stat-icon-wrapper">⏱️</div>
+        <div class="stat-data">
+            <h4 id="study-time">0p</h4>
+            <span>Hôm nay</span>
+        </div>
+    </div>
+
+    <div class="card stat-item book">
+        <div class="stat-icon-wrapper">📚</div>
+        <div class="stat-data">
+            <h4 id="weekly-words">0</h4>
+            <span>Từ / Tuần</span>
+        </div>
+    </div>
+</div>
+
+<div class="card tip-card">
+    <h3 class="tip-title">💡 Mẹo hôm nay</h3>
+    <p class="tip-content">
+        Đừng chỉ học từ đơn lẻ. Hãy học cả cụm từ (phrase). Ví dụ: thay vì học "Decision", hãy học "Make a decision".
+    </p>
 </div>

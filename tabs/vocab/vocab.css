@@ -1,1 +1,38 @@
-/* Vocab specific styles */
+/* Vocab specific styles *//* Stats Mini Dashboard */
+.stats-mini-grid {
+    display: flex; gap: 15px; margin-top: 15px; padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+.stat-mini { font-size: 0.85rem; color: var(--color-text-muted); display: flex; align-items: center; gap: 5px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot.new { background: #3b82f6; }       /* Blue */
+.dot.learning { background: #f59e0b; }  /* Orange */
+.dot.mastered { background: #10b981; }  /* Green */
+
+/* Flashcard Styles */
+.tag-status {
+    background: #f1f5f9; color: #64748b;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 0.75rem; text-transform: uppercase; font-weight: bold;
+}
+
+/* Rating Buttons */
+.btn-rate {
+    flex: 1; padding: 10px 5px; border-radius: 8px; border: none;
+    font-weight: 600; cursor: pointer; color: white;
+    transition: transform 0.1s;
+}
+.btn-rate:active { transform: scale(0.95); }
+.btn-rate small { font-weight: normal; font-size: 0.7rem; opacity: 0.9; display: block; margin-top: 2px; }
+
+.btn-rate.again { background-color: #ef4444; } /* Red */
+.btn-rate.hard { background-color: #f59e0b; }  /* Orange */
+.btn-rate.good { background-color: #3b82f6; }  /* Blue */
+.btn-rate.easy { background-color: #10b981; }  /* Green */
+
+/* Animation chuyển card */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+.card-anim { animation: slideIn 0.3s ease-out; }

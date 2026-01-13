@@ -1,27 +1,61 @@
-/* Animation sóng âm riêng cho trang Speaking */
-.wave-container {
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    margin-top: 15px;
+/* Mic Animation */
+.mic-wrapper { position: relative; width: 80px; height: 80px; margin: 0 auto; }
+.pulse-ring {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    border-radius: 50%; border: 2px solid var(--color-primary);
+    opacity: 0; z-index: 0; pointer-events: none;
+}
+.pulsing .pulse-ring { animation: pulseAnim 1.5s infinite; }
+
+@keyframes pulseAnim {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
 }
 
-.wave-container span {
-    width: 4px;
-    height: 10px;
-    background: var(--color-primary);
-    border-radius: 2px;
-    animation: waveBounce 0.5s infinite alternate;
+/* Score Card */
+.score-card {
+    display: flex; align-items: center; gap: 20px;
+    background: var(--color-surface);
+}
+.score-circle {
+    width: 80px; height: 80px; border-radius: 50%;
+    border: 5px solid var(--color-primary);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    color: var(--color-primary); font-weight: 800; line-height: 1;
+}
+.score-circle span { font-size: 2rem; }
+.score-circle small { font-size: 0.8rem; opacity: 0.7; }
+
+/* Feedback & Highlight */
+.transcript-display {
+    font-size: 1.1rem; line-height: 1.6; padding: 15px;
+    background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;
+}
+.transcript-display.correct {
+    background: #dcfce7; border-color: #86efac; color: #166534; font-weight: 500;
 }
 
-.wave-container span:nth-child(2) { animation-delay: 0.1s; }
-.wave-container span:nth-child(3) { animation-delay: 0.2s; }
-.wave-container span:nth-child(4) { animation-delay: 0.3s; }
-.wave-container span:nth-child(5) { animation-delay: 0.4s; }
+/* Highlight lỗi sai */
+.highlight-error {
+    text-decoration: line-through; text-decoration-color: var(--color-danger);
+    text-decoration-thickness: 2px;
+    background: #fee2e2; color: #991b1b;
+    padding: 2px 4px; border-radius: 4px; margin: 0 2px;
+}
 
-@keyframes waveBounce {
-    from { height: 10px; }
-    to { height: 30px; }
+.correction-arrow { text-align: center; font-size: 1.2rem; margin: 10px 0; color: var(--color-text-muted); }
+
+/* Error List */
+.error-item {
+    font-size: 0.9rem; margin-top: 10px; padding-bottom: 10px; border-bottom: 1px dashed #eee;
+}
+.tag-wrong { color: var(--color-danger); font-weight: bold; }
+.tag-right { color: var(--color-success); font-weight: bold; }
+
+/* Suggestions */
+.native-suggestions { list-style: none; padding: 0; margin-top: 10px; }
+.native-suggestions li {
+    padding: 10px; background: white; margin-bottom: 8px;
+    border-radius: 8px; border-left: 3px solid var(--color-accent);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
 }

@@ -1,11 +1,20 @@
-/* Card */
+/* Card "xịn" */
 .card {
     background: var(--color-surface);
     padding: var(--spacing-md);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
+    /* Dùng bóng đổ sâu hơn */
     margin-bottom: var(--spacing-md);
-    transition: transform var(--transition-fast);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    /* Viền nhẹ tạo hiệu ứng kính */
+    transition: var(--transition-smooth);
+}
+
+/* Hiệu ứng hover nhẹ cho card */
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
 }
 
 /* Buttons */
@@ -14,34 +23,55 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding: var(--spacing-sm);
+    padding: 14px var(--spacing-md);
+    /* Nút cao hơn chút */
     border-radius: var(--radius-md);
     border: none;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     gap: var(--spacing-xs);
-    transition: all var(--transition-fast);
+    transition: var(--transition-smooth);
+    font-size: 1rem;
 }
 
-.btn--primary { background-color: var(--color-primary); color: var(--color-surface); }
-.btn--primary:active, .btn--primary:hover { background-color: var(--color-primary-dark); transform: scale(0.98); }
+.btn--primary {
+    background: var(--gradient-primary);
+    /* Dùng gradient cho nút */
+    color: var(--color-surface);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    /* Bóng màu cho nút */
+}
+
+.btn--primary:active,
+.btn--primary:hover {
+    filter: brightness(1.1);
+    transform: scale(0.98);
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.6);
+}
 
 .btn--outline {
     background-color: transparent;
     border: 2px solid var(--color-text-muted);
     color: var(--color-text-muted);
 }
-.btn--outline:hover { border-color: var(--color-text-main); color: var(--color-text-main); }
+
+.btn--outline:hover {
+    border-color: var(--color-text-main);
+    color: var(--color-text-main);
+}
 
 .btn--circle {
-    width: 80px; height: 80px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     font-size: 2rem;
     margin: 0 auto;
 }
 
 /* Form Inputs */
-.form-input, .form-textarea, select {
+.form-input,
+.form-textarea,
+select {
     width: 100%;
     padding: var(--spacing-sm);
     border: 2px solid var(--color-border);
@@ -51,7 +81,11 @@
     outline: none;
     background: var(--color-surface);
 }
-.form-input:focus, .form-textarea:focus { border-color: var(--color-primary); }
+
+.form-input:focus,
+.form-textarea:focus {
+    border-color: var(--color-primary);
+}
 
 /* Utilities & AI */
 .ai-response {
@@ -65,12 +99,25 @@
 }
 
 .loader {
-    width: 24px; height: 24px;
+    width: 24px;
+    height: 24px;
     border: 3px solid var(--color-bg);
     border-top: 3px solid var(--color-primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     display: inline-block;
 }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.text-danger { color: var(--color-danger); }
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.text-danger {
+    color: var(--color-danger);
+}

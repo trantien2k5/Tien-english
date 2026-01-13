@@ -1,36 +1,63 @@
 <div class="page-header">
-    <h2 class="page-header__title">Luyện Nghe 🎧</h2>
-    <p class="page-header__desc">Luyện nghe với AI Speaker</p>
+    <h2 class="page-header__title">Luyện Nghe Tương Tác 🎧</h2>
+    <p class="page-header__desc">Nghe hội thoại & Trả lời câu hỏi</p>
 </div>
 
 <div class="card">
-    <label style="font-weight:bold; display:block; margin-bottom:10px">Chọn chủ đề:</label>
-    <div style="display:flex; gap:10px;">
-            <select id="listen-topic" style="margin:0; flex:1">
-            <option value="Daily Life">🏡 Đời sống hàng ngày</option>
-            <option value="Technology">💻 Công nghệ & IT</option>
-            <option value="Travel">✈️ Du lịch</option>
-            <option value="Motivation">🔥 Động lực</option>
-        </select>
-        <button id="btn-gen-listen" class="btn btn--primary" style="width:auto">Tạo bài</button>
+    <div style="display:flex; gap: 15px; align-items: flex-end;">
+        <div style="flex: 1;">
+            <label style="font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; display: block;">Chủ đề:</label>
+            <select id="listen-topic" class="form-input" style="margin-bottom: 0;">
+                <option value="Daily Routine">📅 Thói quen hàng ngày</option>
+                <option value="Ordering Coffee">☕ Gọi đồ uống</option>
+                <option value="Job Interview">💼 Phỏng vấn xin việc</option>
+                <option value="Asking Directions">🗺️ Hỏi đường</option>
+                <option value="Shopping">🛍️ Mua sắm</option>
+            </select>
+        </div>
+        <button id="btn-gen-listen" class="btn btn--primary" style="width: auto;">
+            ✨ Tạo bài mới
+        </button>
     </div>
 </div>
 
-<div id="listen-area" class="card" style="display:none; text-align:center">
-    <div id="listen-loader" style="display:none">
-        <div class="loader" style="margin:0 auto"></div>
-        <p style="margin-top:10px">AI đang viết truyện...</p>
+<div id="listen-area" class="card" style="display:none;">
+    
+    <div style="text-align: center; margin-bottom: 25px;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 15px;">
+            <button id="btn-play" class="btn btn--primary btn--circle" style="width: 70px; height: 70px; font-size: 1.8rem;">
+                ▶️
+            </button>
+        </div>
+        
+        <div class="speed-control">
+            <span>Tốc độ:</span>
+            <label><input type="radio" name="speed" value="0.7"> Chậm</label>
+            <label><input type="radio" name="speed" value="1" checked> Chuẩn</label>
+        </div>
+        
+        <p id="audio-status" style="color: var(--color-text-muted); font-size: 0.9rem; margin-top: 10px;">
+            Nhấn Play để nghe hội thoại
+        </p>
     </div>
 
-    <div id="player-controls" style="display:none">
-        <button id="btn-play" class="btn btn--primary btn--circle">
-            ▶️
+    <div class="transcript-box">
+        <button id="btn-toggle-script" class="btn btn--outline" style="font-size: 0.85rem; padding: 8px 15px;">
+            👁️ Xem văn bản hội thoại
         </button>
-        <p id="play-status" style="margin-top:15px; color:#666; font-weight:500">Nhấn để nghe</p>
-        
-        <hr style="margin: 20px 0; border:0; border-top:1px solid #eee">
-        
-        <button id="btn-show-script" class="btn btn--outline">📖 Hiện văn bản gốc</button>
-        <div id="script-content" class="ai-response" style="display:none; text-align:left; margin-top:15px"></div>
+        <div id="script-content" class="ai-response" style="display:none; text-align: left; margin-top: 15px; white-space: pre-line;"></div>
     </div>
+</div>
+
+<div id="quiz-area" class="card" style="display:none;">
+    <h3 style="margin-bottom: 15px; border-left: 4px solid var(--color-primary); padding-left: 10px;">
+        📝 Bài tập hiểu (Comprehension)
+    </h3>
+    <div id="questions-container">
+        </div>
+</div>
+
+<div id="listen-loader" style="text-align: center; margin-top: 30px; display: none;">
+    <div class="loader"></div>
+    <p style="margin-top: 10px; color: var(--color-text-muted);">AI đang soạn bài nghe & câu hỏi...</p>
 </div>

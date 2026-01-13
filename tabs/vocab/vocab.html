@@ -1,17 +1,84 @@
 <div class="page-header">
-    <h2 class="page-header__title">Từ Vựng 📚</h2>
-    <p class="page-header__desc">Tra từ & Tự động tạo ví dụ</p>
+    <h2 class="page-header__title">Từ Vựng & SRS 🧠</h2>
+    <p class="page-header__desc">Hệ thống lặp lại ngắt quãng thông minh</p>
 </div>
 
-<div class="card">
-    <div style="display: flex; gap: 10px;">
-        <input type="text" id="vocab-input" class="form-input" placeholder="Nhập từ mới (vd: Entrepreneur)" style="margin:0">
-        <button id="btn-lookup" class="btn btn--primary" style="width: auto;">🔍</button>
+<div class="card" id="dashboard-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div>
+            <h3 style="margin: 0;">Tiến độ hôm nay</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem;">
+                Cần ôn: <b id="review-count" style="color: var(--color-danger)">0</b> từ
+            </p>
+        </div>
+        <button id="btn-start-review" class="btn btn--primary" style="width: auto; padding: 10px 20px;">
+            🚀 Ôn tập ngay
+        </button>
+    </div>
+    
+    <div class="stats-mini-grid">
+        <div class="stat-mini">
+            <span class="dot new"></span> <span id="count-new">0</span> New
+        </div>
+        <div class="stat-mini">
+            <span class="dot learning"></span> <span id="count-learning">0</span> Learning
+        </div>
+        <div class="stat-mini">
+            <span class="dot mastered"></span> <span id="count-mastered">0</span> Mastered
+        </div>
     </div>
 </div>
 
-<div id="vocab-result" class="card" style="display:none">
-    <h3 id="v-word" style="color: var(--color-primary); font-size: 1.5rem;"></h3>
-    <p id="v-ipa" style="color: #666; font-family: monospace;"></p>
-    <div class="ai-response" id="v-definition"></div>
+<div id="review-ui" class="card" style="display: none; text-align: center; min-height: 300px; justify-content: center; flex-direction: column;">
+    
+    <div class="flashcard-content">
+        <span class="tag-status" id="card-status">Review</span>
+        <h2 id="card-front" style="font-size: 2.5rem; margin: 20px 0; color: var(--color-primary);">Example</h2>
+        <p id="card-ipa" style="color: #888; font-style: italic; margin-bottom: 20px;">/ig'zampl/</p>
+        
+        <div id="card-back" style="display: none; border-top: 1px dashed #eee; padding-top: 20px;">
+            <h3 id="card-meaning" style="font-size: 1.5rem; margin-bottom: 10px;">Ví dụ</h3>
+            <div id="card-example" class="ai-response" style="text-align: left; margin-top: 10px;"></div>
+        </div>
+    </div>
+
+    <div id="review-controls" style="margin-top: 30px;">
+        <button id="btn-show-answer" class="btn btn--primary">Hiện đáp án</button>
+        
+        <div id="rating-btns" style="display: none; gap: 10px; justify-content: center;">
+            <button class="btn-rate again" data-rate="again">
+                Quên<br><small>1p</small>
+            </button>
+            <button class="btn-rate hard" data-rate="hard">
+                Khó<br><small>2d</small>
+            </button>
+            <button class="btn-rate good" data-rate="good">
+                Được<br><small>4d</small>
+            </button>
+            <button class="btn-rate easy" data-rate="easy">
+                Dễ<br><small>7d</small>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="add-word-ui">
+    <div class="card">
+        <h3 style="margin-bottom: 15px;">Thêm từ mới</h3>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="vocab-input" class="form-input" placeholder="Nhập từ mới (vd: Resilience)" style="margin:0">
+            <button id="btn-lookup" class="btn btn--primary" style="width: auto;">🔍</button>
+        </div>
+    </div>
+    
+    <div id="vocab-result" class="card" style="display:none; border-left: 4px solid var(--color-success);">
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                <h3 id="v-word" style="color: var(--color-primary); font-size: 1.5rem;"></h3>
+                <p id="v-ipa" style="color: #666; font-family: monospace;"></p>
+            </div>
+            <button id="btn-save-word" class="btn btn--outline" style="width: auto; height: 40px;">💾 Lưu vào kho</button>
+        </div>
+        <div class="ai-response" id="v-definition"></div>
+    </div>
 </div>

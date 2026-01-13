@@ -1,34 +1,58 @@
 :root {
-    /* Colors - Palette */
+    /* --- COLORS --- */
+    /* Palette phong phú hơn */
     --color-primary: #6366f1;
+    /* Indigo 500 */
     --color-primary-dark: #4f46e5;
-    --color-bg: #f3f4f6;
-    --color-surface: #ffffff;
-    
-    /* Colors - Text */
-    --color-text-main: #1f2937;
-    --color-text-muted: #9ca3af;
-    
-    /* Colors - State */
-    --color-success: #10b981;
-    --color-danger: #ef4444;
-    --color-border: #e5e7eb;
+    /* Indigo 600 */
+    --color-accent: #8b5cf6;
+    /* Violet 500 - dùng cho gradient */
 
-    /* Spacing & Sizing */
+    /* Gradient chủ đạo xịn xò */
+    --gradient-primary: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+
+    /* Background & Surface */
+    --color-bg: #f8fafc;
+    /* Slate 50 - nền sáng và sạch hơn */
+    --color-surface: #ffffff;
+
+    /* Text */
+    --color-text-main: #1e293b;
+    /* Slate 800 - đen dịu */
+    --color-text-muted: #64748b;
+    /* Slate 500 */
+
+    /* State colors */
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    /* Amber 500 - cho streak */
+    --color-info: #3b82f6;
+    /* Blue 500 - cho thời gian */
+    --color-danger: #ef4444;
+
+    /* --- SPACING & SIZING --- */
     --spacing-xs: 8px;
     --spacing-sm: 12px;
-    --spacing-md: 20px;
-    --spacing-lg: 25px;
-    
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    
+    --spacing-md: 24px;
+    /* Tăng padding để thoáng hơn */
+    --spacing-lg: 32px;
+
+    --radius-md: 16px;
+    /* Bo góc tròn hơn */
+    --radius-lg: 24px;
+    /* Bo góc thẻ lớn hơn */
+
     --nav-height: 70px;
     --container-max-width: 900px;
 
-    /* Effects */
-    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --transition-fast: 0.2s ease-in-out;
+    /* --- EFFECTS (Chìa khóa của sự "xịn xò") --- */
+    /* Bóng đổ 2 lớp tạo chiều sâu */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    /* Transition mượt mà */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 * {
@@ -39,9 +63,28 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: var(--color-bg);
     color: var(--color-text-main);
-    line-height: 1.5;
+    line-height: 1.6;
+    /* Tăng khoảng cách dòng cho dễ đọc */
     padding-bottom: calc(var(--nav-height) + var(--spacing-md));
+}
+
+/* Animation xuất hiện mượt mà cho toàn bộ nội dung */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Áp dụng animation cho container chính mỗi khi load tab */
+#app>* {
+    animation: fadeSlideUp 0.5s var(--transition-smooth) forwards;
 }
