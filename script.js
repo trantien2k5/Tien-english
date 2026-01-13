@@ -382,7 +382,6 @@ function addXP(amount) {
     updateProgressTab();
 }
 
-
 window.speak = (text) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
@@ -395,3 +394,54 @@ window.speak = (text) => {
 
     window.speechSynthesis.speak(utterance);
 };
+
+window.checkAnswer = (btn, selectedIdx, correctIdx, explanation) => {
+    const feedbackEl = document.getElementById('fb');
+    feedbackEl.style.display = 'block';
+    
+    // Tìm tất cả các nút quiz trong cùng một câu hỏi để vô hiệu hóa sau khi chọn
+    const parent = btn.parentElement;
+    const buttons = parent.querySelectorAll('.quiz-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    if (selectedIdx === correctIdx) {
+        // Xử lý khi chọn đúng
+        btn.style.borderColor = "#10b981"; // Màu success từ style.css
+        btn.style.background = "#ecfdf5";
+        feedbackEl.innerHTML = `✅ <b>Chính xác!</b> <br> ${explanation}`;
+        feedbackEl.style.background = "#ecfdf5";
+        feedbackEl.style.color = "#065f46";
+        
+        // Cộng 20 XP khi trả lời đúng (sử dụng hàm addXP đã có)
+        if (typeof addXP === 'function') addXP(20); 
+    } else {
+        // Xử lý khi chọn sai
+        btn.style.borderColor = "#ef4444"; // Màu danger từ style.css
+        btn.style.background = "#fef2f2";
+        feedbackEl.innerHTML = `❌ <b>Chưa đúng rồi!</b> <br> ${explanation}`;
+        feedbackEl.style.background = "#fef2f2";
+        feedbackEl.style.color = "#991b1b";
+        
+        // Hiển thị nút đúng để người dùng biết
+        buttons[correctIdx].style.borderColor = "#10b981";
+        buttons[correctIdx].style.background = "#ecfdf5";
+    }
+};
+
+function showToast(message, type = "info") {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerText = message;
+    document.body.appendChild(toast)    ;
+    setTimeout(() => { toast.classList.add('show'); }, 100);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => { document.body.removeChild(toast); }, 300);
+    }, 3000);
+}
+async function callAI(key, topic, mode, level) {
+    return await callOpenAI(key, topic, mode, level);
+}
+
+
+
