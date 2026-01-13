@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WordStock AI - Học Tiếng Anh</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="app-header">
+        <div class="logo">🇬🇧 WordStock AI</div>
+        <div class="header-actions">
+            <button id="settingsBtn" class="icon-btn">⚙️</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="tab-learn" class="tab-content active">
+            <section class="card input-section">
+                <div class="card-header">
+                    <h2>Tạo bài học mới</h2>
+                    <span class="badge">Gemini AI</span>
+                </div>
+                <textarea id="userInput" placeholder="Nhập chủ đề..."></textarea>
+                <div class="controls">
+                    <div class="control-group">
+                        <label>Chế độ học:</label>
+                        <select id="modeSelect">
+                            <option value="story">📖 Truyện & Đọc hiểu</option>
+                            <option value="vocab">🔤 Từ vựng chuyên sâu</option>
+                            <option value="grammar">✍️ Giải thích Ngữ pháp</option>
+                            <option value="conversation">🗣️ Hội thoại giao tiếp</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Trình độ:</label>
+                        <select id="levelSelect">
+                            <option value="Beginner">Dễ</option>
+                            <option value="Intermediate" selected>Vừa</option>
+                            <option value="Advanced">Khó</option>
+                        </select>
+                    </div>
+                    <button id="generateBtn" class="btn-primary">✨ Tạo bài học</button>
+                </div>
+            </section>
+            <div id="resultArea" class="result-section hidden">
+                <div class="loader hidden" id="loader">
+                    <div class="spinner"></div>
+                </div>
+                <div id="contentDisplay"></div>
+            </div>
+        </section>
+
+        <section id="tab-vocab" class="tab-content hidden">
+            <div class="card">
+                <div class="card-header">
+                    <h2>📔 Kho từ vựng của bạn</h2>
+                    <button onclick="clearAllVocab()" class="btn-secondary" style="font-size: 10px; color: red;">Xoá
+                        hết</button>
+                </div>
+                <div id="vocabListDisplay" class="vocab-grid">
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-speak" class="tab-content hidden">
+            <div class="card speak-container"
+                style="text-align: center; min-height: 400px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <h2>🗣️ Luyện nói cùng AI</h2>
+                    <p class="desc">Nhấn giữ micro và nói bằng tiếng Anh, AI sẽ trò chuyện cùng bạn.</p>
+                </div>
+
+                <div id="chat-box"
+                    style="flex-grow: 1; margin: 20px 0; overflow-y: auto; text-align: left; padding: 10px; border: 1px inset #eee; border-radius: 10px; max-height: 200px;">
+                    <p style="color: #94a3b8; font-style: italic;">Cuộc hội thoại sẽ hiện ở đây...</p>
+                </div>
+
+                <div class="visualizer-container"
+                    style="height: 60px; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                    <div id="v-bar" class="v-bar"></div>
+                </div>
+
+                <div>
+                    <div id="speech-status"
+                        style="font-size: 0.8rem; color: var(--primary); margin-bottom: 10px; font-weight: bold;">Sẵn
+                        sàng</div>
+                    <button id="micBtn" class="btn-primary"
+                        style="width: 80px; height: 80px; border-radius: 50%; font-size: 2rem; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);">🎤</button>
+                </div>
+            </div>
+        </section>
+
+        <div id="vocabListDisplay">
+            <div class="empty-state">
+                <p>✨ Bạn chưa có từ vựng nào.</p>
+                <small>Hãy quay lại tab 🏠 Học để tạo bài học và bấm nút (+) để lưu từ nhé!</small>
+            </div>
+        </div>
+
+        <div id="review-guide" class="hidden">
+            <p>🎉 Tuyệt vời! Bạn đã ôn hết từ hôm nay.</p>
+            <button onclick="switchTab(0)" class="btn-secondary">Tiếp tục học bài mới</button>
+        </div>
+
+        <section id="tab-review" class="tab-content hidden">
+            <div class="card review-container"
+                style="text-align: center; min-height: 450px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <h2>🧠 Ôn tập Flashcards</h2>
+                <p class="desc">Lật thẻ để kiểm tra trí nhớ của bạn.</p>
+
+                <div id="flashcard" class="flashcard">
+                    <div class="flashcard-inner" id="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h1 id="card-word">...</h1>
+                            <small>Bấm để xem nghĩa</small>
+                        </div>
+                        <div class="flashcard-back">
+                            <h2 id="card-meaning">...</h2>
+                            <p style="margin-top: 10px; color: var(--primary);">Đã nhớ chưa?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-controls" style="margin-top: 30px; display: flex; gap: 20px;">
+                    <button id="prevBtn" class="btn-secondary">⬅️ Trước</button>
+                    <button id="nextBtn" class="btn-primary" style="width: 120px;">Tiếp theo ➡️</button>
+                </div>
+
+                <p id="card-counter" style="margin-top: 15px; color: var(--text-sub); font-size: 0.8rem;"></p>
+            </div>
+        </section>
+        <section id="tab-progress" class="tab-content hidden">
+            <div class="card">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h2 style="font-size: 1.5rem;">📊 Hồ sơ năng lực</h2>
+                    <p class="desc">Bạn đang tiến bộ rất nhanh!</p>
+                </div>
+
+                <div class="achievement-card"
+                    style="background: linear-gradient(135deg, #4f46e5, #9333ea); color: white; padding: 20px; border-radius: 20px; margin-bottom: 25px; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <div class="level-circle"
+                            style="background: rgba(255,255,255,0.2); width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; border: 3px solid white;">
+                            <span id="display-level">1</span>
+                        </div>
+
+                        <div style="flex-grow: 1;">
+                            <h3 id="display-rank" style="margin: 0; font-size: 1.2rem; letter-spacing: 1px;">TÂN BINH
+                            </h3>
+                            <div
+                                style="width: 100%; height: 8px; background: rgba(0,0,0,0.2); border-radius: 10px; margin-top: 10px; overflow: hidden;">
+                                <div id="xp-bar"
+                                    style="width: 30%; height: 100%; background: #fff; border-radius: 10px; transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                                </div>
+                            </div>
+                            <p id="xp-text" style="font-size: 0.75rem; margin-top: 5px; opacity: 0.9;">30/100 XP để lên
+                                cấp tiếp theo</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid"
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                    <div class="stat-box"
+                        style="background: #f1f5f9; padding: 15px; border-radius: 16px; text-align: center;">
+                        <span style="font-size: 1.5rem;">📚</span>
+                        <h3 id="stat-vocab-count" style="margin: 5px 0; color: #4f46e5;">0</h3>
+                        <p style="font-size: 0.7rem; font-weight: bold; color: #64748b;">TỪ VỰNG</p>
+                    </div>
+                    <div class="stat-box"
+                        style="background: #f1f5f9; padding: 15px; border-radius: 16px; text-align: center;">
+                        <span style="font-size: 1.5rem;">🔥</span>
+                        <h3 id="stat-streak" style="margin: 5px 0; color: #ef4444;">1</h3>
+                        <p style="font-size: 0.7rem; font-weight: bold; color: #64748b;">STREAK</p>
+                    </div>
+                </div>
+
+                <div class="badges-section">
+                    <h4 style="margin-bottom: 12px; font-size: 0.9rem;">Huy hiệu vinh danh</h4>
+                    <div id="badge-container" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="keyModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Cấu hình API Key</h3>
+            <p class="desc">Dán Gemini API Key của bạn để bắt đầu.</p>
+            <input type="password" id="apiKeyInput" placeholder="Dán Key vào đây...">
+            <div class="modal-buttons">
+                <button id="saveKeyBtn" class="btn-primary">Lưu Key</button>
+                <button id="closeModalBtn" class="btn-secondary">Đóng</button>
+            </div>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="link-help">👉 Lấy Key miễn phí tại
+                đây</a>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Học tập</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🗣️</span>
+            <span class="nav-label">Luyện nói</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">📚</span>
+            <span class="nav-label">Kho từ</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">🧠</span>
+            <span class="nav-label">Ôn tập</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Tiến độ</span>
+        </a>
+    </nav>
+
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
