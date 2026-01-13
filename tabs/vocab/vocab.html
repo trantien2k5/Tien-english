@@ -1,0 +1,17 @@
+<div class="page-header">
+    <h2 class="page-header__title">Từ Vựng 📚</h2>
+    <p class="page-header__desc">Tra từ & Tự động tạo ví dụ</p>
+</div>
+
+<div class="card">
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="vocab-input" class="form-input" placeholder="Nhập từ mới (vd: Entrepreneur)" style="margin:0">
+        <button id="btn-lookup" class="btn btn--primary" style="width: auto;">🔍</button>
+    </div>
+</div>
+
+<div id="vocab-result" class="card" style="display:none">
+    <h3 id="v-word" style="color: var(--color-primary); font-size: 1.5rem;"></h3>
+    <p id="v-ipa" style="color: #666; font-family: monospace;"></p>
+    <div class="ai-response" id="v-definition"></div>
+</div>

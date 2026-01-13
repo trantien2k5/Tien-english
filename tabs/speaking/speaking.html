@@ -1,0 +1,26 @@
+<div class="page-header">
+    <h2 class="page-header__title">Luyện Nói 🎤</h2>
+    <p class="page-header__desc">AI sẽ kiểm tra ngữ pháp giúp bạn</p>
+</div>
+
+<div class="card" style="text-align: center; padding: 40px 20px;">
+    <button id="btn-record" class="btn btn--primary btn--circle">
+        🎙️
+    </button>
+    <p id="status-text" style="margin-top: 15px; font-weight: 500;">Nhấn để nói...</p>
+    
+    <div id="wave-animation" class="wave-container" style="display:none">
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Kết quả:</h3>
+    <p id="user-transcript" style="font-style: italic; color: #555;">(Chưa có dữ liệu)</p>
+    
+    <div id="ai-feedback-box" style="display:none">
+        <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+        <h4>🤖 AI Phân tích:</h4>
+        <div id="ai-content" class="ai-response"></div>
+    </div>
+</div>

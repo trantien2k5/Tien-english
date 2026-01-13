@@ -1,0 +1,36 @@
+<div class="page-header">
+    <h2 class="page-header__title">Luyện Nghe 🎧</h2>
+    <p class="page-header__desc">Luyện nghe với AI Speaker</p>
+</div>
+
+<div class="card">
+    <label style="font-weight:bold; display:block; margin-bottom:10px">Chọn chủ đề:</label>
+    <div style="display:flex; gap:10px;">
+            <select id="listen-topic" style="margin:0; flex:1">
+            <option value="Daily Life">🏡 Đời sống hàng ngày</option>
+            <option value="Technology">💻 Công nghệ & IT</option>
+            <option value="Travel">✈️ Du lịch</option>
+            <option value="Motivation">🔥 Động lực</option>
+        </select>
+        <button id="btn-gen-listen" class="btn btn--primary" style="width:auto">Tạo bài</button>
+    </div>
+</div>
+
+<div id="listen-area" class="card" style="display:none; text-align:center">
+    <div id="listen-loader" style="display:none">
+        <div class="loader" style="margin:0 auto"></div>
+        <p style="margin-top:10px">AI đang viết truyện...</p>
+    </div>
+
+    <div id="player-controls" style="display:none">
+        <button id="btn-play" class="btn btn--primary btn--circle">
+            ▶️
+        </button>
+        <p id="play-status" style="margin-top:15px; color:#666; font-weight:500">Nhấn để nghe</p>
+        
+        <hr style="margin: 20px 0; border:0; border-top:1px solid #eee">
+        
+        <button id="btn-show-script" class="btn btn--outline">📖 Hiện văn bản gốc</button>
+        <div id="script-content" class="ai-response" style="display:none; text-align:left; margin-top:15px"></div>
+    </div>
+</div>
