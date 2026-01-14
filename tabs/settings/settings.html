@@ -10,6 +10,7 @@
             <div class="pc-badges">
                 <span class="badge badge-level" id="disp-level">A1</span>
                 <span class="badge badge-streak">🔥 <span id="disp-streak">0</span> ngày</span>
+                <span class="badge" id="disp-goal" style="background:#dcfce7; color:#166534">🎯 0/15p</span>
             </div>
         </div>
         <button class="btn-edit-profile" id="btn-edit-profile" title="Chỉnh sửa">✏️</button>
@@ -97,6 +98,18 @@
         <span>Hiển thị Transcript sau khi trả lời</span>
         <label class="switch"><input type="checkbox" id="inp-show-script"><span class="slider-round"></span></label>
     </div>
+    <div class="setting-row">
+        <span>Tự động phát lại câu sai</span>
+        <label class="switch"><input type="checkbox" id="inp-auto-replay"><span class="slider-round"></span></label>
+    </div>
+    <div class="setting-row">
+        <span>Ẩn tiếng Việt (Hard Mode)</span>
+        <label class="switch"><input type="checkbox" id="inp-hide-vi"><span class="slider-round"></span></label>
+    </div>
+    <div class="setting-row">
+        <span>Chế độ luyện phản xạ</span>
+        <label class="switch"><input type="checkbox" id="inp-reflex"><span class="slider-round"></span></label>
+    </div>
 </div>
 
 <div class="setting-label">🎨 Trải nghiệm</div>
@@ -169,9 +182,13 @@
 <div class="settings-footer">
     <p>WordStock v1.2 • Pro Edition</p>
     <div class="footer-links">
-        <span>Điều khoản</span> • <span>Bảo mật</span> • <span>Góp ý</span>
+        <a href="#" style="color:inherit">Điều khoản</a> • 
+        <a href="#" style="color:inherit">Bảo mật</a> • 
+        <a href="mailto:support@wordstock.com" style="color:inherit">Góp ý</a>
     </div>
 </div>
+
+<div id="setting-overlay" class="modal-overlay"></div>
 
 <div id="ai-library-view" class="sub-view">
     <div class="sub-header">

@@ -40,8 +40,13 @@ export default {
             valVReview: document.getElementById('val-v-review'),
 
             // Learning & Experience
+            // PATCH_v2
+            dispGoal: document.getElementById('disp-goal'),
             inpAutoNext: document.getElementById('inp-auto-next'),
             inpShowScript: document.getElementById('inp-show-script'),
+            inpAutoReplay: document.getElementById('inp-auto-replay'),
+            inpHideVi: document.getElementById('inp-hide-vi'),
+            inpReflex: document.getElementById('inp-reflex'),
             inpDarkMode: document.getElementById('inp-dark-mode'),
             inpSound: document.getElementById('inp-sound'),
             
@@ -75,6 +80,10 @@ export default {
         if(this.els.dispName) this.els.dispName.innerText = this.settings.username || 'Student';
         if(this.els.dispLevel) this.els.dispLevel.innerText = this.settings.level || 'A1';
         if(this.els.dispStreak) this.els.dispStreak.innerText = Storage.getStats().streak || 0;
+        
+        // PATCH_v2: Update Goal Info
+        const currentMins = parseInt(localStorage.getItem('daily_minutes') || '0');
+        if(this.els.dispGoal) this.els.dispGoal.innerText = `🎯 ${currentMins}/${this.settings.dailyGoal || 15}p`;
 
         // 2. Goal
         const goal = this.settings.dailyGoal || 15;
@@ -88,8 +97,12 @@ export default {
         this.els.modeBtns.forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
 
         // 4. Learning & Experience
+        // PATCH_v2
         if(this.els.inpAutoNext) this.els.inpAutoNext.checked = this.settings.autoPlayNext;
         if(this.els.inpShowScript) this.els.inpShowScript.checked = this.settings.showScriptAfter;
+        if(this.els.inpAutoReplay) this.els.inpAutoReplay.checked = this.settings.autoReplayWrong;
+        if(this.els.inpHideVi) this.els.inpHideVi.checked = this.settings.hideVietnamese;
+        if(this.els.inpReflex) this.els.inpReflex.checked = this.settings.reflexMode;
         
         if(this.els.inpDarkMode) {
             this.els.inpDarkMode.checked = this.settings.darkMode;
@@ -149,13 +162,45 @@ export default {
     },
 
     bindEvents() {
-        // Accordion
+        // PATCH_v3: Popup Flow Logic (Centered + Close Button)
+        const overlay = document.getElementById('setting-overlay');
+        
         this.els.items.forEach(item => {
+            // Auto-inject Close Button
+            const body = item.querySelector('.setting-body');
+            if(body && !body.querySelector('.btn-popup-close')) {
+                const btn = document.createElement('button');
+                btn.className = 'btn-popup-close';
+                btn.innerHTML = '✕';
+                btn.onclick = (e) => {
+                    e.stopPropagation(); // Tránh trigger ngược lên header
+                    item.classList.remove('active');
+                    if(overlay) overlay.classList.remove('active');
+                };
+                body.prepend(btn);
+            }
+
             item.querySelector('.setting-header')?.addEventListener('click', () => {
-                this.els.items.forEach(i => i !== item && i.classList.remove('active'));
-                item.classList.toggle('active');
+                const isActive = item.classList.contains('active');
+                // Reset all
+                this.els.items.forEach(i => i.classList.remove('active'));
+                
+                if (!isActive) {
+                    item.classList.add('active');
+                    if(overlay) overlay.classList.add('active');
+                } else {
+                    if(overlay) overlay.classList.remove('active');
+                }
             });
         });
+
+        // Close when click overlay
+        if(overlay) {
+            overlay.addEventListener('click', () => {
+                this.els.items.forEach(i => i.classList.remove('active'));
+                overlay.classList.remove('active');
+            });
+        }
 
         // --- Inputs Change Events (SAFE MODE: Use ?. to prevent crash) ---
         
@@ -181,9 +226,20 @@ export default {
         const bindToggle = (el, key) => {
             if(el) el.addEventListener('change', (e) => this.save(key, e.target.checked));
         };
+        // PATCH_v2
         bindToggle(this.els.inpAutoNext, 'autoPlayNext');
         bindToggle(this.els.inpShowScript, 'showScriptAfter');
-        bindToggle(this.els.inpSound, 'soundEffects');
+        bindToggle(this.els.inpAutoReplay, 'autoReplayWrong');
+        bindToggle(this.els.inpHideVi, 'hideVietnamese');
+        bindToggle(this.els.inpReflex, 'reflexMode');
+
+        // Haptic Feedback for Sound Toggle
+        if(this.els.inpSound) {
+            this.els.inpSound.addEventListener('change', (e) => {
+                this.save('soundEffects', e.target.checked);
+                if(e.target.checked && navigator.vibrate) navigator.vibrate(50);
+            });
+        }
         
         this.els.inpDarkMode?.addEventListener('change', (e) => {
             this.save('darkMode', e.target.checked);
