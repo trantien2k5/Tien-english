@@ -8,6 +8,7 @@ export default {
         this.bindEvents();
         this.bindChipEvents(); // Handle Chips UI
         this.renderRecent();   // Show history
+        this.updateDashboard(); // PATCH_v2
     },
 
     // PATCH_v2
@@ -63,6 +64,22 @@ export default {
             btn.innerHTML = originalText;
             this.generateLesson(); // Call main function
         }, 800);
+    },
+
+    // PATCH_v2
+    updateDashboard() {
+        const tasks = JSON.parse(localStorage.getItem('daily_tasks')) || { vocab: false, listening: false, speaking: false };
+        const doneCount = [tasks.vocab, tasks.listening, tasks.speaking].filter(Boolean).length;
+        
+        const countEl = document.getElementById('db-count');
+        if(countEl) countEl.innerText = `${doneCount}/3`;
+
+        const steps = document.querySelectorAll('.db-step');
+        if(steps.length >= 3) {
+            if(tasks.vocab) steps[0].classList.add('done');
+            if(tasks.listening) steps[1].classList.add('done');
+            if(tasks.speaking) steps[2].classList.add('done');
+        }
     },
 
     renderRecent() {
