@@ -10,18 +10,59 @@ export default {
         this.renderRecent();   // Show history
     },
 
+    // PATCH_v2
     bindChipEvents() {
         const chips = document.querySelectorAll('.chip');
         const input = document.getElementById('listen-topic');
+        
+        // Window functions for HTML onClick
+        window.listenMode = (mode) => this.switchMode(mode);
+
         chips.forEach(chip => {
             chip.addEventListener('click', () => {
-                // UI update
                 chips.forEach(c => c.classList.remove('active'));
                 chip.classList.add('active');
-                // Logic update
-                input.value = chip.dataset.val;
+                if(input) input.value = chip.dataset.val;
             });
         });
+    },
+
+    // --- NEW LOGIC: MODES & DASHBOARD ---
+    switchMode(mode) {
+        // UI Reset
+        document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+        // Find clicked card (simple logic based on order or passed element, here we just visual sync)
+        
+        const customUI = document.getElementById('custom-setup-ui');
+        
+        if (mode === 'custom') {
+            customUI.style.display = 'block';
+            window.scrollTo({ top: customUI.offsetTop, behavior: 'smooth' });
+        } else if (mode === 'smart') {
+            customUI.style.display = 'none';
+            this.handleSmartStart();
+        } else if (mode === 'review') {
+            alert("Tính năng Ôn tập lỗi sai (Mistake Bank) sẽ có ở bản v2! 🛠️");
+        }
+    },
+
+    handleSmartStart() {
+        // AI Logic: Pick topic dựa trên History hoặc Random
+        const topics = ["Ordering Food", "Airport Check-in", "Job Interview", "Making Friends", "Weather Talk"];
+        const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+        
+        // Auto-fill & Generate
+        document.getElementById('listen-topic').value = randomTopic;
+        
+        // Hiệu ứng UX
+        const btn = document.querySelector('.mode-card[onclick*="smart"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<div class="loader" style="width:20px;height:20px"></div> Đang chọn bài...`;
+        
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            this.generateLesson(); // Call main function
+        }, 800);
     },
 
     renderRecent() {
@@ -331,33 +372,6 @@ export default {
         window.speechSynthesis.speak(utterance);
     },
 
-    checkAnswer(btn) {
-        // Nếu đã chọn rồi thì không cho chọn lại trong cùng 1 câu
-        const parent = btn.parentElement;
-        if (parent.classList.contains('answered')) return;
-
-        const qIndex = parseInt(btn.dataset.q);
-        const optIndex = parseInt(btn.dataset.opt);
-        const correctIndex = this.currentData.questions[qIndex].correct;
-
-        // Đánh dấu đã trả lời
-        parent.classList.add('answered');
-
-        if (optIndex === correctIndex) {
-            btn.classList.add('correct');
-            // Sound effect nhỏ (optional)
-        } else {
-            btn.classList.add('wrong');
-            // Highlight câu đúng
-            parent.children[correctIndex].classList.add('correct');
-        }
-
-        // Hiện giải thích
-        document.getElementById(`explain-${qIndex}`).style.display = 'block';
-
-        // Kiểm tra xem đã làm hết chưa -> Lưu tiến độ
-        this.checkCompletion();
-    },
 
     checkCompletion() {
         const totalQ = this.currentData.questions.length;

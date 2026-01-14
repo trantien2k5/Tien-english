@@ -3,33 +3,64 @@
     <p class="page-header__desc">Nghe hội thoại & Trả lời câu hỏi</p>
 </div>
 
-<div class="card quick-start-card">
-    <h3 class="card-title">🚀 Quick Start</h3>
+<div class="card dashboard-card">
+    <div class="db-header">
+        <div>
+            <h3 class="card-title">📅 Kế hoạch hôm nay</h3>
+            <p class="db-subtitle">Hoàn thành để duy trì Streak 🔥</p>
+        </div>
+        <div class="db-progress">
+            <span id="db-count">0/3</span>
+        </div>
+    </div>
+    <div class="db-steps">
+        <div class="db-step done">✅ 1. Daily Vocab (5p)</div>
+        <div class="db-step active">⏳ 2. Luyện nghe AI (3p)</div>
+        <div class="db-step">🔒 3. Speaking Challenge</div>
+    </div>
+</div>
+
+<div class="mode-grid">
+    <div class="mode-card active" onclick="window.listenMode('smart')">
+        <div class="mc-icon">🚀</div>
+        <h4>Lộ trình AI</h4>
+        <p>AI tự chọn bài phù hợp nhất</p>
+    </div>
+    <div class="mode-card" onclick="window.listenMode('custom')">
+        <div class="mc-icon">✍️</div>
+        <h4>Tự chọn</h4>
+        <p>Bạn thích chủ đề gì?</p>
+    </div>
+    <div class="mode-card" onclick="window.listenMode('review')">
+        <div class="mc-icon">🔁</div>
+        <h4>Ôn tập lỗi</h4>
+        <p>Luyện lại câu nghe sai</p>
+    </div>
+</div>
+
+<div id="custom-setup-ui" class="card fade-in" style="display:none; margin-top:20px; border-left:4px solid var(--color-primary)">
+    <h3 class="card-title">🎛️ Thiết lập bài nghe</h3>
     
     <label class="section-label">Chủ đề (Topic)</label>
     <div class="chip-grid" id="topic-chips">
         <div class="chip active" data-val="Daily Routine">📅 Thói quen</div>
-        <div class="chip" data-val="Ordering Coffee">☕ Cafe</div>
         <div class="chip" data-val="Travel">✈️ Du lịch</div>
-        <div class="chip" data-val="Job Interview">💼 Phỏng vấn</div>
-        <div class="chip" data-val="Shopping">🛒 Shopping</div>
-        <div class="chip" data-val="Health">🏥 Sức khỏe</div>
+        <div class="chip" data-val="Work">💼 Công việc</div>
+        <div class="chip" data-val="IELTS Part 1">🎓 IELTS</div>
     </div>
-    <input type="hidden" id="listen-topic" value="Daily Routine">
-
-    <label class="section-label" style="margin-top:15px">Trình độ (Level)</label>
-    <div class="level-selector">
-        <select id="listen-level" class="form-input" style="margin:0">
-            <option value="A1">A1 - Sơ cấp (Câu đơn)</option>
-            <option value="A2" selected>A2 - Cơ bản (Hội thoại)</option>
-            <option value="B1">B1 - Trung cấp (Thực tế)</option>
-            <option value="B2">B2 - Nâng cao (Tốc độ nhanh)</option>
-        </select>
+    <div class="input-group mt-3">
+        <input type="text" id="listen-topic" class="form-input" value="Daily Routine" placeholder="Hoặc nhập chủ đề bất kỳ...">
     </div>
 
-    <button id="btn-gen-listen" class="btn btn--primary btn-lg mt-3">
-        ✨ Tạo bài nghe ngay
-    </button>
+    <label class="section-label">Trình độ</label>
+    <select id="listen-level" class="form-input">
+        <option value="A1">A1 - Sơ cấp</option>
+        <option value="A2" selected>A2 - Cơ bản</option>
+        <option value="B1">B1 - Trung cấp</option>
+        <option value="B2">B2 - Nâng cao</option>
+    </select>
+
+    <button id="btn-gen-listen" class="btn btn--primary mt-3">✨ Tạo bài nghe ngay</button>
 </div>
 
 <div id="recent-area" style="margin-bottom: 20px;">

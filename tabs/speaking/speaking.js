@@ -133,6 +133,14 @@ export default {
             const raw = await askAI(prompt, "You are a JSON English Coach.");
             const data = JSON.parse(raw.replace(/```json|```/g, '').trim());
 
+           // PATCH_v2: Lưu History tại đây vì có userText
+            Storage.addToHistory(
+                'speaking',
+                `Practice: Score ${data.score}/10`,
+                data,
+                `User: "${userText}" -> AI: ${data.comment}`
+            );
+
             this.renderResult(data);
             this.updateProgress(data.score);
 
