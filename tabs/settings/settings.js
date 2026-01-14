@@ -162,43 +162,46 @@ export default {
     },
 
     bindEvents() {
-        // PATCH_v3: Popup Flow Logic (Centered + Close Button)
+        // PATCH_v2: Popup Flow Logic (Scroll Lock Fixed)
         const overlay = document.getElementById('setting-overlay');
-        
+        const toggleScroll = (lock) => document.body.classList.toggle('no-scroll', lock);
+
         this.els.items.forEach(item => {
-            // Auto-inject Close Button
+            // Close Button Logic
             const body = item.querySelector('.setting-body');
             if(body && !body.querySelector('.btn-popup-close')) {
                 const btn = document.createElement('button');
                 btn.className = 'btn-popup-close';
                 btn.innerHTML = '✕';
                 btn.onclick = (e) => {
-                    e.stopPropagation(); // Tránh trigger ngược lên header
+                    e.stopPropagation();
                     item.classList.remove('active');
                     if(overlay) overlay.classList.remove('active');
+                    toggleScroll(false); // Mở cuộn
                 };
                 body.prepend(btn);
             }
 
             item.querySelector('.setting-header')?.addEventListener('click', () => {
                 const isActive = item.classList.contains('active');
-                // Reset all
-                this.els.items.forEach(i => i.classList.remove('active'));
+                this.els.items.forEach(i => i.classList.remove('active')); // Reset all
                 
                 if (!isActive) {
                     item.classList.add('active');
                     if(overlay) overlay.classList.add('active');
+                    toggleScroll(true); // Khóa cuộn
                 } else {
                     if(overlay) overlay.classList.remove('active');
+                    toggleScroll(false);
                 }
             });
         });
 
-        // Close when click overlay
         if(overlay) {
             overlay.addEventListener('click', () => {
                 this.els.items.forEach(i => i.classList.remove('active'));
                 overlay.classList.remove('active');
+                toggleScroll(false);
             });
         }
 

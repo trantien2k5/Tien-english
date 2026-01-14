@@ -1,0 +1,58 @@
+<div class="page-header">
+    <h2 class="page-header__title">Smart Reading 📖</h2>
+    <p class="page-header__desc">Luyện đọc hiểu chuyên sâu với AI</p>
+</div>
+
+<div id="reading-setup" class="card setup-card">
+    <h3 class="card-title">Thiết lập bài đọc</h3>
+    
+    <label class="section-label">Chủ đề (Topic)</label>
+    <input type="text" id="read-topic" class="form-input" placeholder="VD: Technology, Health, Business...">
+
+    <div style="display:flex; gap:10px; margin-bottom:15px">
+        <div style="flex:1">
+            <label class="section-label">Trình độ</label>
+            <select id="read-level" class="form-input">
+                <option value="A2">A2 - Cơ bản</option>
+                <option value="B1">B1 - Trung cấp</option>
+                <option value="B2">B2 - Nâng cao</option>
+                <option value="C1">C1 - Học thuật</option>
+            </select>
+        </div>
+        <div style="flex:1">
+            <label class="section-label">Mục tiêu</label>
+            <select id="read-goal" class="form-input">
+                <option value="general">📚 General Reading</option>
+                <option value="ielts">🎓 IELTS Academic</option>
+                <option value="work">💼 Workplace Email</option>
+            </select>
+        </div>
+    </div>
+
+    <button id="btn-gen-reading" class="btn btn--primary btn-lg">✨ Tạo bài đọc ngay</button>
+</div>
+
+<div id="reading-interface" style="display:none; animation: fadeSlideUp 0.5s;">
+    <div class="reading-toolbar">
+        <div class="timer">⏱️ <span id="r-timer">00:00</span></div>
+        <button class="btn-text" onclick="location.reload()">Thoát</button>
+    </div>
+
+    <div class="reading-layout">
+        <div class="reading-pane">
+            <h2 id="r-title" class="article-title">Title</h2>
+            <div id="r-content" class="article-content"></div>
+        </div>
+        
+        <div class="question-pane">
+            <div class="q-header">QUESTIONS</div>
+            <div id="r-questions" class="q-list"></div>
+            <button id="btn-submit-reading" class="btn btn--primary mt-3">✅ Nộp bài</button>
+        </div>
+    </div>
+</div>
+
+<div id="reading-loader" class="loader-container" style="display:none; text-align:center; padding:30px">
+    <div class="loader"></div>
+    <p style="margin-top:10px; color:#64748b">AI đang soạn bài đọc...</p>
+</div>

@@ -1,0 +1,54 @@
+/* Layout chia cột (PC) */
+.reading-layout {
+    display: grid; grid-template-columns: 6fr 4fr; gap: 20px;
+    height: calc(100vh - 200px); min-height: 500px;
+}
+
+/* Bài đọc */
+.reading-pane {
+    background: #fff; padding: 30px; border-radius: 12px;
+    overflow-y: auto; border: 1px solid #e2e8f0;
+    font-family: 'Georgia', serif; line-height: 1.8; color: #334155;
+    font-size: 1.05rem;
+}
+.article-title {
+    font-size: 1.8rem; color: #1e293b; margin-bottom: 20px;
+    font-family: 'Inter', sans-serif; font-weight: 800;
+}
+.vocab-highlight {
+    background: #fef3c7; border-bottom: 2px solid #f59e0b;
+    cursor: pointer; padding: 0 2px;
+}
+
+/* Câu hỏi */
+.question-pane {
+    background: #f8fafc; padding: 20px; border-radius: 12px;
+    overflow-y: auto; border: 1px solid #f1f5f9;
+}
+.quiz-item { background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 10px; }
+
+/* Trạng thái đáp án */
+.option-btn {
+    padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;
+    margin-top: 5px; cursor: pointer; transition: 0.2s;
+}
+.option-btn:hover { background: #f1f5f9; }
+.option-btn.selected { background: #e0f2fe; border-color: #3b82f6; color: #0284c7; font-weight: 600; }
+.option-btn.correct { background: #dcfce7 !important; border-color: #22c55e !important; color: #15803d; }
+.option-btn.wrong { background: #fee2e2 !important; border-color: #ef4444 !important; opacity: 0.6; }
+
+/* Giải thích & Từ vựng */
+.explain-box { margin-top: 10px; padding: 10px; background: #fffbeb; border-left: 3px solid #f59e0b; font-size: 0.9rem; }
+.glossary-box { margin-top: 20px; padding: 15px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0; }
+
+/* Toolbar */
+.reading-toolbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 15px; background: white; padding: 10px 15px;
+    border-radius: 8px; border: 1px solid #e2e8f0;
+}
+.timer { font-weight: 700; color: var(--color-primary); font-family: monospace; font-size: 1.1rem; }
+
+@media (max-width: 768px) {
+    .reading-layout { grid-template-columns: 1fr; height: auto; }
+}

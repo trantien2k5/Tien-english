@@ -164,19 +164,36 @@ input:checked + .slider-round:before { transform: translateX(20px); }
 .setting-item.active .s-chevron { transform: rotate(90deg); }
 .setting-item.active .setting-header { background-color: #f8fafc; }
 
-/* PATCH_v3: Centered Modal UI */
+/* PATCH_v4: Fix Popup Visibility */
+body.no-scroll { overflow: hidden; height: 100vh; }
+
 .setting-body {
     position: fixed; top: 50%; left: 50%;
-    width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto;
-    background: white; z-index: 2001;
-    border-radius: 16px; /* Bo tròn đều */
-    padding: 25px 20px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    /* Effect: Zoom In */
-    transform: translate(-50%, -50%) scale(0.9); opacity: 0;
-    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    display: block !important; visibility: hidden;
+    width: 90%; max-width: 450px; max-height: 85vh; overflow-y: auto;
+    background: rgba(255, 255, 255, 0.98); z-index: 2001;
+    border-radius: 24px; padding: 30px 25px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    
+    /* Hidden State */
+    transform: translate(-50%, -48%) scale(0.96); 
+    opacity: 0; visibility: hidden;
+    transition: all 0.2s ease-out;
+    display: block !important;
 }
+
+/* Active State (QUAN TRỌNG: Để hiện popup) */
+.setting-item.active .setting-body {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1; visibility: visible;
+}
+
+/* Overlay Style */
+.modal-overlay {
+    backdrop-filter: blur(5px); background: rgba(0, 0, 0, 0.4);
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: all 0.3s ease; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000;
+}
+.modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 .setting-item.active .setting-body { 
     transform: translate(-50%, -50%) scale(1); opacity: 1; visibility: visible; 
 }
