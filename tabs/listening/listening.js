@@ -38,23 +38,23 @@ export default {
         window.speechSynthesis.cancel(); // Dừng đọc cũ
 
         try {
-            // --- PROMPT KỸ THUẬT ---
-            // Yêu cầu trả về JSON thuần túy để JS dễ xử lý
+            // --- PROMPT KỸ THUẬT (Updated v2: Level + SRS) ---
+            const level = document.getElementById('listen-level').value;
             const prompt = `
-                Create an English listening lesson about "${topic}" (Level A2).
-                1. A short dialogue (2 people, 8-12 lines).
-                2. 3 multiple-choice comprehension questions.
-                
-                Return ONLY valid JSON format like this (no markdown, no extra text):
+                Create a listening lesson. Topic: "${topic}". Level: ${level}.
+                Structure:
+                1. Dialogue (A1: simple/slow, B2: natural/idioms). 8-15 lines.
+                2. 3 Quiz questions (MCQ).
+                3. 3 Key phrases/words for SRS learning (extract from dialogue).
+
+                Return ONLY valid JSON:
                 {
-                    "dialogue": "Person A: Hi...\\nPerson B: Hello...",
+                    "dialogue": "Person A: ...",
                     "questions": [
-                        {
-                            "q": "Question text?",
-                            "options": ["A. Answer 1", "B. Answer 2", "C. Answer 3"],
-                            "correct": 0,
-                            "explain": "Explanation why..."
-                        }
+                        { "q": "...", "options": ["A...", "B...", "C..."], "correct": 0, "explain": "..." }
+                    ],
+                    "srs_vocab": [
+                        { "word": "...", "meaning": "...", "ipa": "/.../" }
                     ]
                 }
             `;
@@ -92,7 +92,47 @@ export default {
 
     },
 
+    // [NEW] Hàm lưu từ vào SRS
+    addToSRS(index) {
+        const btn = document.querySelector(`.btn-srs-add[data-idx="${index}"]`);
+        const item = this.currentData.srs_vocab[index];
+        if(!item) return;
+
+        Storage.addVocab({
+            word: item.word, meaning: item.meaning, ipa: item.ipa || '',
+            example: `<p>Context: ${this.currentData.topic}</p>`,
+            status: 'new', dueDate: Date.now(), interval: 0
+        });
+
+        if(btn) {
+            btn.innerHTML = '✔ Đã lưu';
+            btn.style.background = 'var(--color-success)';
+            btn.style.color = 'white';
+            btn.style.borderColor = 'transparent';
+            btn.disabled = true;
+        }
+    },
+
     renderLesson() {
+        // 0. Render SRS Vocab (Nếu có)
+        const vList = document.getElementById('vocab-extract-list');
+        const vArea = document.getElementById('vocab-extract-area');
+        if (vArea) {
+            vArea.style.display = this.currentData.srs_vocab ? 'block' : 'none';
+            if (this.currentData.srs_vocab) {
+                vList.innerHTML = this.currentData.srs_vocab.map((w, i) => `
+                    <div class="vocab-row">
+                        <div>
+                            <div style="font-weight:700; color:#0f172a">${w.word} <small style="color:#64748b">${w.ipa||''}</small></div>
+                            <div style="font-size:0.9rem; color:#334155">${w.meaning}</div>
+                        </div>
+                        <button class="btn-srs-add" data-idx="${i}">＋ Lưu SRS</button>
+                    </div>
+                `).join('');
+                vList.querySelectorAll('.btn-srs-add').forEach(b => b.addEventListener('click', () => this.addToSRS(b.dataset.idx)));
+            }
+        }
+
         // 1. Render Audio Script
         document.getElementById('script-content').innerText = this.currentData.dialogue;
 

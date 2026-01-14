@@ -53,23 +53,36 @@ export const Storage = {
     },
 
     /**
-     * ✅ LƯU LỊCH SỬ BÀI NGHE
-     * Giúp user xem lại bài cũ, tránh tạo lại bài trùng chủ đề ngay lập tức
+     * ✅ LƯU LỊCH SỬ BÀI NGHE (Đã nâng cấp Anti-Duplicate)
      */
     addListeningHistory(lessonData) {
         const history = this.get('listening_history');
+        const key = lessonData.topic.trim().toLowerCase(); // Normalized Key
+
+        const existingIndex = history.findIndex(l => l.topic.trim().toLowerCase() === key);
         
-        // Thêm timestamp ID
+        if (existingIndex > -1) {
+            // BEHAVIOR CHANGE: Nếu trùng Topic -> Chỉ update seenCount & move lên đầu
+            const existing = history[existingIndex];
+            existing.seenCount = (existing.seenCount || 1) + 1;
+            existing.lastSeen = Date.now();
+            
+            history.splice(existingIndex, 1);
+            history.unshift(existing); // Đưa lên đầu
+            this.set('listening_history', history);
+            return { status: 'updated', lesson: existing };
+        }
+
+        // Tạo mới hoàn toàn
         lessonData.id = Date.now();
-        lessonData.completed = false; // Trạng thái làm bài
-
-        // Thêm vào đầu danh sách
-        history.unshift(lessonData);
+        lessonData.seenCount = 1;
+        lessonData.completed = false;
         
-        // Giới hạn lưu 50 bài gần nhất để nhẹ máy
+        history.unshift(lessonData);
         if (history.length > 50) history.pop();
-
+        
         this.set('listening_history', history);
+        return { status: 'new', lesson: lessonData };
     },
 
     // Lấy thống kê nhanh cho Home

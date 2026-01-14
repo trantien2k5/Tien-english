@@ -75,11 +75,19 @@ export default {
         };
     },
 
-    startRecording() {
+   startRecording() { 
+        // PATCH_v2: BEHAVIOR CHANGE -> Toggle Stop logic fix
+        const micPulse = document.getElementById('mic-pulse'); 
+        
+        if (micPulse && micPulse.classList.contains('pulsing')) { 
+            this.recognition.stop(); 
+            return; 
+        }
+
         try {
             this.recognition.start();
             document.getElementById('status-text').innerText = "Đang nghe...";
-            document.getElementById('mic-pulse').classList.add('pulsing');
+            if (micPulse) micPulse.classList.add('pulsing');
             document.getElementById('wave-animation').style.display = 'flex';
             document.getElementById('btn-record').style.backgroundColor = 'var(--color-danger)';
         } catch (e) {
@@ -188,9 +196,25 @@ renderResult(data) {
         });
     }
 
-    // 4. Native Suggestions
+    // 4. Native Suggestions (Update: Có nút nghe 🔊)
     const suggestList = document.getElementById('suggestion-list');
-    suggestList.innerHTML = data.better_versions.map(s => `<li>${s}</li>`).join('');
+    suggestList.innerHTML = data.better_versions.map(s => `
+        <li>
+            <span class="suggest-text">${s}</span>
+            <button class="btn-speak-sm" data-text="${s}">🔊</button>
+        </li>
+    `).join('');
+
+    // Gắn sự kiện đọc mẫu ngay lập tức
+    suggestList.querySelectorAll('.btn-speak-sm').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Chống click nhầm
+            const utt = new SpeechSynthesisUtterance(e.target.dataset.text);
+            utt.lang = 'en-US'; 
+            utt.rate = 0.9; // Đọc chậm một chút cho dễ nghe
+            window.speechSynthesis.speak(utt);
+        });
+    });
 
     // Lưu kết quả chấm điểm
     Storage.addToHistory(
