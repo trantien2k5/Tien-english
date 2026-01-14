@@ -1,11 +1,19 @@
+import { Storage } from '../../services/storage.js'; // PATCH_v2: Import Storage
+
 export default {
     init() {
+        this.syncHeader(); // PATCH_v2: Cập nhật tên
         this.checkNewDay();
         this.renderDailyPlan();
-        this.renderStats(); // Gọi hàm render chỉ số
+        this.renderStats(); 
 
-        // Expose hàm startTask ra window để gọi từ HTML
         window.startTask = (taskType) => this.handleTaskClick(taskType);
+    },
+
+    syncHeader() {
+        const settings = Storage.getSettings();
+        const title = document.querySelector('.page-header__title');
+        if(title) title.innerText = `Xin chào, ${settings.username || 'Student'}! 👋`;
     },
 
     // --- 1. LOGIC DAILY PLAN ---
@@ -59,19 +67,14 @@ export default {
         }
     },
 
+    // PATCH_v2: Chỉ điều hướng, không đánh dấu xong (Anti-Cheat)
     handleTaskClick(taskType) {
-        const tasks = JSON.parse(localStorage.getItem('daily_tasks')) || {};
-        tasks[taskType] = true;
-        localStorage.setItem('daily_tasks', JSON.stringify(tasks));
-
-        // Chuyển tab
+        // Chuyển tab để người dùng làm bài thật
         const navItem = document.querySelector(`.nav-item[data-target="${taskType}"]`);
         if (navItem) {
             navItem.click();
         }
-        
-        // Re-render để thấy trạng thái mới ngay (nếu quay lại)
-        this.renderDailyPlan();
+        // Lưu ý: Trạng thái 'done' sẽ do các tab con tự cập nhật vào localStorage
     },
 
     // --- 2. LOGIC STATS (STREAK, TIME) ---

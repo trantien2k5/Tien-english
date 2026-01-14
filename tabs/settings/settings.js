@@ -207,6 +207,15 @@ export default {
         this.els.inpUsername?.addEventListener('change', (e) => this.save('username', e.target.value));
         this.els.inpLevel?.addEventListener('change', (e) => this.save('level', e.target.value));
         this.els.inpGoalTarget?.addEventListener('change', (e) => this.save('goalTarget', e.target.value));
+        
+        // PATCH_v2: Handle Save Button
+        document.getElementById('btn-save-profile')?.addEventListener('click', () => {
+            // Đóng popup
+            document.getElementById('item-profile').classList.remove('active');
+            document.getElementById('setting-overlay').classList.remove('active');
+            // Feedback
+            alert(`Đã cập nhật hồ sơ: ${this.settings.username} (${this.settings.level}) ✅`);
+        });
 
         this.els.inpDailySlider?.addEventListener('input', (e) => {
             if(this.els.valDaily) this.els.valDaily.innerText = e.target.value;

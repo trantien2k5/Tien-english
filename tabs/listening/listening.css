@@ -175,7 +175,22 @@ body.focus-mode .player-card { position: fixed; top: 0; left: 0; width: 100%; he
     border-radius: 8px; color: #1e40af; font-size: 0.9rem;
     display: none; border-left: 4px solid #3b82f6;
 }
+/* PATCH_v3: Dictation Styling */
 .quiz-explain strong { color: var(--color-primary); }
+
+.dictation-box { border-left: 4px solid #8b5cf6; background: #fdf4ff; }
+.dictation-text { font-size: 1.1rem; line-height: 1.8; color: #475569; font-weight: 500; }
+
+.gap-input {
+    border: none; border-bottom: 2px solid #cbd5e1; background: transparent;
+    width: 80px; text-align: center; font-weight: 700; color: var(--color-primary);
+    outline: none; transition: all 0.2s; padding: 0 5px;
+}
+.gap-input:focus { border-color: var(--color-primary); transform: scale(1.05); }
+.gap-input.correct { border-color: #10b981; color: #10b981; }
+.gap-input.wrong { border-color: #ef4444; color: #ef4444; }
+
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; width: auto; display: inline-block; }
 
 /* --- Vocab Cards Styles --- */
 .vocab-section { background: linear-gradient(to right, #f0f9ff, #e0f2fe); border: 1px solid #bae6fd; }

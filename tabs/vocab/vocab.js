@@ -134,9 +134,15 @@ export default {
         document.getElementById('rating-btns').style.display = 'none';
     },
 
+    // PATCH_v2: Sync with Home Tab
     finishReview() {
+        // Cập nhật Daily Plan
+        const tasks = JSON.parse(localStorage.getItem('daily_tasks')) || {};
+        tasks.vocab = true;
+        localStorage.setItem('daily_tasks', JSON.stringify(tasks));
+
         alert("Chúc mừng! Bạn đã hoàn thành phiên ôn tập hôm nay. 🔥");
-        location.reload(); // Tải lại trang để cập nhật Dashboard
+        location.reload(); 
     },
 
 

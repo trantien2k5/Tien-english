@@ -150,10 +150,17 @@ export default {
         }
     },
 
-// [NEW] Logic cộng điểm EXP & Streak
+// [NEW] Logic cộng điểm EXP & Streak & Daily Plan
 updateProgress(score) {
+    // PATCH_v2: Sync Daily Plan
+    const tasks = JSON.parse(localStorage.getItem('daily_tasks')) || {};
+    if (!tasks.speaking) {
+        tasks.speaking = true;
+        localStorage.setItem('daily_tasks', JSON.stringify(tasks));
+        // Hiệu ứng ăn mừng nhỏ nếu cần
+    }
+
     // 1. Cộng EXP (Giả lập)
-    // Lưu ý: Cần kết nối Home logic sau này
     let currentExp = parseInt(localStorage.getItem('user_exp') || '0');
     const bonus = score >= 8 ? 15 : 10;
     localStorage.setItem('user_exp', currentExp + bonus);
