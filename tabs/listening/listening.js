@@ -6,22 +6,76 @@ export default {
 
     init() {
         this.bindEvents();
-        // Kiểm tra nếu có bài đang học dở (Optional: có thể thêm logic load từ localStorage)
+        this.bindChipEvents(); // Handle Chips UI
+        this.renderRecent();   // Show history
+    },
+
+    bindChipEvents() {
+        const chips = document.querySelectorAll('.chip');
+        const input = document.getElementById('listen-topic');
+        chips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                // UI update
+                chips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                // Logic update
+                input.value = chip.dataset.val;
+            });
+        });
+    },
+
+    renderRecent() {
+        const list = Storage.getHistory('listening'); // Lấy 200 items gần nhất
+        const container = document.getElementById('recent-list');
+        if(!container) return;
+
+        if (list.length === 0) {
+            container.innerHTML = '<p style="font-size:0.9rem; color:#999; text-align:center; padding:10px;">📭 Chưa có bài học nào. Tạo bài mới ngay!</p>';
+            return;
+        }
+
+        // Lấy 3 bài gần nhất
+        const recent3 = list.slice(0, 3);
+        
+        container.innerHTML = recent3.map(item => `
+            <div class="recent-item" onclick="alert('Tính năng tiếp tục bài học sẽ cập nhật ở v2!')">
+                <div class="recent-info">
+                    <h5>${item.title}</h5>
+                    <span>${new Date(item.createdAt).toLocaleDateString()} • ${item.content?.questions?.length || 3} câu hỏi</span>
+                </div>
+                <div class="recent-status">⏯</div>
+            </div>
+        `).join('');
     },
 
     bindEvents() {
         // 1. Nút Tạo bài
         document.getElementById('btn-gen-listen').addEventListener('click', () => this.generateLesson());
 
-        // 2. Nút Play Audio
+        // 2. Player Controls
         document.getElementById('btn-play').addEventListener('click', () => this.toggleAudio());
+        
+        // Speed Selector
+        document.querySelectorAll('.speed-opt').forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                document.querySelectorAll('.speed-opt').forEach(o => o.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
 
-        // 3. Ẩn/Hiện transcript
-        document.getElementById('btn-toggle-script').addEventListener('click', (e) => {
-            const scriptBox = document.getElementById('script-content');
-            const isHidden = scriptBox.style.display === 'none';
-            scriptBox.style.display = isHidden ? 'block' : 'none';
-            e.target.innerText = isHidden ? '🙈 Ẩn văn bản' : '👁️ Xem văn bản hội thoại';
+        // Focus Mode
+        document.getElementById('btn-focus-mode').addEventListener('click', () => {
+            document.body.classList.toggle('focus-mode');
+        });
+
+        // 3. Toggle Transcript
+        document.getElementById('btn-toggle-script').addEventListener('click', () => {
+            const content = document.getElementById('script-content');
+            const icon = document.querySelector('.ts-header i');
+            const isHidden = content.style.display === 'none';
+            
+            content.style.display = isHidden ? 'block' : 'none';
+            icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
         });
     },
 
@@ -40,16 +94,21 @@ export default {
         try {
             // --- PROMPT KỸ THUẬT (Updated v2: Level + SRS) ---
             const level = document.getElementById('listen-level').value;
+            // PATCH_v2: Prompt nâng cấp - Tách câu hội thoại
             const prompt = `
                 Create a listening lesson. Topic: "${topic}". Level: ${level}.
                 Structure:
-                1. Dialogue (A1: simple/slow, B2: natural/idioms). 8-15 lines.
+                1. Dialogue: 6-10 turns. Natural conversation.
                 2. 3 Quiz questions (MCQ).
-                3. 3 Key phrases/words for SRS learning (extract from dialogue).
+                3. 3 Key phrases for SRS.
 
                 Return ONLY valid JSON:
                 {
-                    "dialogue": "Person A: ...",
+                    "topic_en": "English Topic Name",
+                    "dialogue": [
+                        {"speaker": "A", "text": "Hello, how are you?"},
+                        {"speaker": "B", "text": "I'm good, thanks!"}
+                    ],
                     "questions": [
                         { "q": "...", "options": ["A...", "B...", "C..."], "correct": 0, "explain": "..." }
                     ],
@@ -92,108 +151,179 @@ export default {
 
     },
 
-    // [NEW] Hàm lưu từ vào SRS
     addToSRS(index) {
-        const btn = document.querySelector(`.btn-srs-add[data-idx="${index}"]`);
+        const btn = document.getElementById(`btn-save-${index}`);
         const item = this.currentData.srs_vocab[index];
         if(!item) return;
 
+        // Gọi Storage service
         Storage.addVocab({
-            word: item.word, meaning: item.meaning, ipa: item.ipa || '',
-            example: `<p>Context: ${this.currentData.topic}</p>`,
-            status: 'new', dueDate: Date.now(), interval: 0
+            word: item.word,
+            meaning: item.meaning,
+            ipa: item.ipa || '',
+            example: `<p>Context: <b>${this.currentData.topic_en || 'Listening Lesson'}</b></p>`,
+            status: 'new',
+            dueDate: Date.now(),
+            interval: 0
         });
 
+        // Feedback UI
         if(btn) {
-            btn.innerHTML = '✔ Đã lưu';
-            btn.style.background = 'var(--color-success)';
-            btn.style.color = 'white';
-            btn.style.borderColor = 'transparent';
+            btn.innerHTML = '<span>✔ Đã lưu vào kho</span>';
+            btn.classList.add('saved');
             btn.disabled = true;
         }
     },
 
     renderLesson() {
-        // 0. Render SRS Vocab (Nếu có)
+        // 0. Render SRS Vocab (Card UI)
         const vList = document.getElementById('vocab-extract-list');
         const vArea = document.getElementById('vocab-extract-area');
-        if (vArea) {
-            vArea.style.display = this.currentData.srs_vocab ? 'block' : 'none';
-            if (this.currentData.srs_vocab) {
-                vList.innerHTML = this.currentData.srs_vocab.map((w, i) => `
-                    <div class="vocab-row">
-                        <div>
-                            <div style="font-weight:700; color:#0f172a">${w.word} <small style="color:#64748b">${w.ipa||''}</small></div>
-                            <div style="font-size:0.9rem; color:#334155">${w.meaning}</div>
+        
+        if (vArea && this.currentData.srs_vocab) {
+            vArea.style.display = 'block';
+            vList.innerHTML = this.currentData.srs_vocab.map((w, i) => `
+                <div class="vocab-card">
+                    <div>
+                        <div class="vc-top">
+                            <span class="vc-word">${w.word}</span>
+                            <span class="vc-ipa">${w.ipa || ''}</span>
                         </div>
-                        <button class="btn-srs-add" data-idx="${i}">＋ Lưu SRS</button>
+                        <div class="vc-meaning">${w.meaning}</div>
                     </div>
-                `).join('');
-                vList.querySelectorAll('.btn-srs-add').forEach(b => b.addEventListener('click', () => this.addToSRS(b.dataset.idx)));
-            }
+                    <button id="btn-save-${i}" class="btn-srs-save" onclick="window.saveVocabSRS(${i})">
+                        <span>＋ Lưu từ này</span>
+                    </button>
+                </div>
+            `).join('');
+            
+            // Expose function
+            window.saveVocabSRS = (i) => this.addToSRS(i);
+        } else if (vArea) {
+            vArea.style.display = 'none';
         }
 
-        // 1. Render Audio Script
-        document.getElementById('script-content').innerText = this.currentData.dialogue;
+        // 1. Render Smart Transcript (Chat Style)
+        const scriptBox = document.getElementById('script-content');
+        scriptBox.innerHTML = this.currentData.dialogue.map((line, idx) => `
+            <div class="chat-row" onclick="window.playSentence(${idx})">
+                <div class="speaker-tag ${line.speaker === 'A' ? 'sp-a' : 'sp-b'}">${line.speaker}</div>
+                <div class="chat-text">${line.text}</div>
+                <button class="btn-replay-line">🔊</button>
+            </div>
+        `).join('');
+        
+        // Expose function cho HTML gọi
+        window.playSentence = (idx) => this.playSentence(idx);
 
-        // 2. Render Quiz
+        // 2. Render Quiz (Pro Interface)
         const container = document.getElementById('questions-container');
-        container.innerHTML = ''; // Xóa cũ
+        container.innerHTML = ''; 
 
         this.currentData.questions.forEach((q, index) => {
             const quizItem = document.createElement('div');
             quizItem.className = 'quiz-item';
 
-            // Tạo HTML cho options
             const optionsHtml = q.options.map((opt, optIndex) => `
-                <div class="option-btn" data-q="${index}" data-opt="${optIndex}">
+                <div class="option-btn" onclick="window.handleQuizClick(this, ${index}, ${optIndex})">
                     ${opt}
                 </div>
             `).join('');
 
             quizItem.innerHTML = `
-                <div class="quiz-question">${index + 1}. ${q.q}</div>
-                <div class="quiz-options">${optionsHtml}</div>
+                <div class="quiz-question"><span style="color:var(--color-primary)">Q${index + 1}:</span> ${q.q}</div>
+                <div class="quiz-options" id="q-opts-${index}">${optionsHtml}</div>
                 <div class="quiz-explain" id="explain-${index}">
-                    💡 <strong>Giải thích:</strong> ${q.explain}
+                    💡 <strong>Giải thích:</strong> ${q.explain || 'Không có giải thích chi tiết.'}
                 </div>
             `;
             container.appendChild(quizItem);
         });
-
-        // Gắn sự kiện click cho các đáp án
-        document.querySelectorAll('.option-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => this.checkAnswer(e.target));
-        });
+        
+        // Expose function để HTML gọi trực tiếp (tránh lỗi binding)
+        window.handleQuizClick = (btn, qIdx, optIdx) => this.checkAnswer(btn, qIdx, optIdx);
     },
 
+    checkAnswer(btn, qIndex, optIndex) {
+        const parent = document.getElementById(`q-opts-${qIndex}`);
+        if (parent.classList.contains('answered')) return; // Chặn click lại
+
+        const correctIndex = this.currentData.questions[qIndex].correct;
+        parent.classList.add('answered');
+
+        if (optIndex === correctIndex) {
+            btn.classList.add('correct');
+        } else {
+            btn.classList.add('wrong');
+            // Highlight đáp án đúng
+            parent.children[correctIndex].classList.add('correct');
+        }
+
+        // Hiện giải thích với animation
+        const explainEl = document.getElementById(`explain-${qIndex}`);
+        explainEl.style.display = 'block';
+        explainEl.style.animation = 'slideDown 0.3s ease';
+
+        this.checkCompletion();
+    },
+
+    // PATCH_v2: Hỗ trợ đọc toàn bài (Join Array)
     toggleAudio() {
+        const visualizer = document.querySelector('.audio-visualizer');
+        const btnPlay = document.getElementById('btn-play');
+        const status = document.getElementById('audio-status');
+
         if (this.isSpeaking) {
             window.speechSynthesis.cancel();
             this.isSpeaking = false;
-            document.getElementById('btn-play').innerText = "▶️";
-            document.getElementById('audio-status').innerText = "Đã tạm dừng";
+            btnPlay.innerText = "▶️";
+            status.innerText = "Đã tạm dừng";
+            visualizer.classList.remove('playing');
         } else {
             if (!this.currentData) return;
 
-            const utterance = new SpeechSynthesisUtterance(this.currentData.dialogue);
-            utterance.lang = 'en-US';
-
-            // Lấy tốc độ từ radio button
-            const speed = document.querySelector('input[name="speed"]:checked').value;
-            utterance.rate = parseFloat(speed);
-
-            utterance.onend = () => {
+            // Nối mảng thành văn bản hội thoại
+            const fullText = this.currentData.dialogue.map(l => `${l.speaker === 'A' ? 'Man' : 'Woman'}: ${l.text}`).join('. ');
+            
+            this.speakText(fullText, () => {
                 this.isSpeaking = false;
-                document.getElementById('btn-play').innerText = "▶️";
-                document.getElementById('audio-status').innerText = "Đã đọc xong. Hãy làm bài tập bên dưới!";
-            };
+                btnPlay.innerText = "▶️";
+                status.innerText = "Hoàn thành bài nghe.";
+                visualizer.classList.remove('playing');
+            });
 
-            window.speechSynthesis.speak(utterance);
             this.isSpeaking = true;
-            document.getElementById('btn-play').innerText = "⏸️"; // Nút Pause
-            document.getElementById('audio-status').innerText = "Đang đọc...";
+            btnPlay.innerText = "⏸️";
+            status.innerText = "Đang phát toàn bài...";
+            visualizer.classList.add('playing');
         }
+    },
+
+    // [NEW] Đọc 1 câu cụ thể
+    playSentence(index) {
+        window.speechSynthesis.cancel(); // Dừng bài đang đọc
+        const line = this.currentData.dialogue[index];
+        if(!line) return;
+
+        // Highlight UI
+        document.querySelectorAll('.chat-row').forEach(r => r.classList.remove('active-line'));
+        document.querySelectorAll('.chat-row')[index].classList.add('active-line');
+
+        this.speakText(line.text, () => {
+             document.querySelectorAll('.chat-row')[index].classList.remove('active-line');
+        });
+    },
+
+    // Helper wrapper cho SpeechSynthesis
+    speakText(text, onEndCallback) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        
+        const speedEl = document.querySelector('.speed-opt.active');
+        utterance.rate = speedEl ? parseFloat(speedEl.dataset.val) : 1.0;
+
+        utterance.onend = onEndCallback;
+        window.speechSynthesis.speak(utterance);
     },
 
     checkAnswer(btn) {
