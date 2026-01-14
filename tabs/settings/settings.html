@@ -1,16 +1,60 @@
 <div class="page-header">
     <h2 class="page-header__title">Cài đặt ⚙️</h2>
-    <p class="page-header__desc">Quản lý cấu hình ứng dụng</p>
+    <p class="page-header__desc">Quản lý cấu hình & Mục tiêu học tập</p>
 </div>
+
 <div class="card">
-    <h3>OpenAI API Key</h3>
-    <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px">
-        Nhập key của bạn để kích hoạt tính năng thông minh. 
-        Key được lưu an toàn trên trình duyệt của bạn.
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0;">OpenAI API Key</h3>
+        <button id="btn-delete-key" class="btn-text-danger" style="display: none; font-size: 0.85rem;">
+            🗑️ Xóa Key
+        </button>
+    </div>
+
+    <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px">
+        Key được lưu cục bộ trên trình duyệt của bạn (Local Storage).
+        App không chia sẻ key này đi bất cứ đâu.
     </p>
-    <input type="password" id="api-key" class="form-input" placeholder="sk-...">
-    <button id="save-key" class="btn btn--primary">Lưu Cấu Hình</button>
+
+    <div class="input-group">
+        <input type="password" id="api-key" class="form-input" placeholder="sk-..." autocomplete="off">
+        <button id="btn-toggle-eye" class="input-icon-btn" title="Hiện/Ẩn Key">
+            👁️
+        </button>
+    </div>
+
+    <button id="save-key" class="btn btn--primary">
+        💾 Lưu Cấu Hình
+    </button>
 </div>
-<div class="card" style="text-align:center; color: #999">
-    WordStock App v1.0 (Refactored)
+
+<div class="card">
+    <h3>🎯 Mục tiêu & Trình độ</h3>
+
+    <div style="margin-top: 15px;">
+        <label class="form-label">Mục tiêu mỗi ngày</label>
+        <div class="option-row">
+            <button class="btn-option" data-goal="5">5 phút</button>
+            <button class="btn-option active" data-goal="10">10 phút</button>
+            <button class="btn-option" data-goal="15">15 phút</button>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <label class="form-label">Trình độ hiện tại</label>
+        <select id="user-level" class="form-input" style="margin-bottom: 0;">
+            <option value="A1">A1 - Mới bắt đầu</option>
+            <option value="A2">A2 - Sơ cấp (Elementary)</option>
+            <option value="B1">B1 - Trung cấp (Intermediate)</option>
+        </select>
+    </div>
+</div>
+
+<div class="settings-footer">
+    <p>WordStock App v1.2</p>
+    <p style="font-size: 0.8rem; opacity: 0.7;">Refactored with Product Mindset</p>
+    <button id="btn-export-data" class="btn btn--outline"
+        style="margin-top: 10px; width: auto; font-size: 0.8rem; padding: 5px 15px;">
+        📤 Export dữ liệu JSON
+    </button>
 </div>

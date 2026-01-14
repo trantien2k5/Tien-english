@@ -80,5 +80,38 @@ export const Storage = {
             masteredCount: vocab.filter(w => w.status === 'mastered').length,
             streak: parseInt(localStorage.getItem('user_streak') || 0)
         };
+    },
+
+    /**
+     * ✅ QUẢN LÝ SETTINGS TẬP TRUNG (Namespace + Version)
+     * Key lưu trữ: 'wordstock_settings_v1'
+     */
+    SETTINGS_KEY: 'wordstock_settings_v1',
+
+    getSettings() {
+        const defaultSettings = {
+            apiKey: '',
+            dailyGoal: 10,     // 10 phút/ngày
+            level: 'A2',       // Trình độ hiện tại
+            theme: 'light'
+        };
+        const raw = localStorage.getItem(this.SETTINGS_KEY);
+        if (!raw) return defaultSettings;
+        
+        // Merge với default để tránh lỗi khi upgrade version mới thêm trường mới
+        return { ...defaultSettings, ...JSON.parse(raw) };
+    },
+
+    saveSettings(newSettings) {
+        // Lấy setting cũ để merge (tránh ghi đè mất dữ liệu khác)
+        const current = this.getSettings();
+        const final = { ...current, ...newSettings, updatedAt: Date.now() };
+        localStorage.setItem(this.SETTINGS_KEY, JSON.stringify(final));
+    },
+    
+    // Hàm tiện ích lấy nhanh API Key cho các service khác
+    getApiKey() {
+        const settings = this.getSettings();
+        return settings.apiKey || '';
     }
 };

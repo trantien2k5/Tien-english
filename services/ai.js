@@ -1,3 +1,4 @@
+import { Storage } from './storage.js';
 // Cấu hình API
 const API_URL = "https://api.openai.com/v1/chat/completions";
 
@@ -7,7 +8,8 @@ const API_URL = "https://api.openai.com/v1/chat/completions";
  * @param {string} systemRole - Vai trò của AI
  */
 export async function askAI(prompt, systemRole = "You are a helpful English tutor.") {
-    const apiKey = localStorage.getItem('openai_key');
+    // ✅ Dùng hàm mới để lấy key an toàn
+    const apiKey = Storage.getApiKey(); 
     
     if (!apiKey) {
         throw new Error("Vui lòng nhập API Key trong phần Settings!");

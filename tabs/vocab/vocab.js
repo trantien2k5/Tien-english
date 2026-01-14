@@ -19,9 +19,9 @@ export default {
         // Lấy dữ liệu từ localStorage
         const raw = localStorage.getItem('vocab_list');
         this.vocabList = raw ? JSON.parse(raw) : [];
-        
+
         // Kiểm tra xem có từ nào cần ôn hôm nay không
-        const today = new Date().setHours(0,0,0,0);
+        const today = new Date().setHours(0, 0, 0, 0);
         this.reviewSession = this.vocabList.filter(word => {
             return word.dueDate <= today || word.status === 'new';
         });
@@ -42,9 +42,9 @@ export default {
         // Reset UI
         document.getElementById('vocab-input').value = '';
         document.getElementById('vocab-result').style.display = 'none';
-        
+
         // Reload dữ liệu để cập nhật Dashboard
-        this.loadData(); 
+        this.loadData();
         this.renderDashboard();
     },
 
@@ -84,7 +84,7 @@ export default {
         if (rating === 'again') {
             word.interval = 0; // Reset về 0 ngày
             word.status = 'learning';
-            word.dueDate = now.setHours(0,0,0,0); // Ôn lại ngay hôm nay (hoặc cuối phiên)
+            word.dueDate = now.setHours(0, 0, 0, 0); // Ôn lại ngay hôm nay (hoặc cuối phiên)
         } else {
             // Tính toán Interval mới
             let multiplier = 1;
@@ -127,7 +127,7 @@ export default {
         document.getElementById('dashboard-card').style.display = 'none';
         document.getElementById('add-word-ui').style.display = 'none';
         document.getElementById('review-ui').style.display = 'flex';
-        
+
         this.currentCardIndex = 0;
         this.showCard(0);
     },
@@ -135,7 +135,7 @@ export default {
     showCard(index) {
         const word = this.reviewSession[index];
         const cardUI = document.getElementById('review-ui');
-        
+
         // Reset UI
         cardUI.classList.remove('card-anim');
         void cardUI.offsetWidth; // Trigger reflow
@@ -145,7 +145,7 @@ export default {
         document.getElementById('card-status').className = `tag-status ${word.status}`; // thêm class màu
         document.getElementById('card-front').innerText = word.word;
         document.getElementById('card-ipa').innerText = word.ipa;
-        
+
         // Ẩn mặt sau
         document.getElementById('card-meaning').innerText = word.meaning;
         document.getElementById('card-example').innerHTML = word.example;
@@ -159,70 +159,137 @@ export default {
         location.reload(); // Tải lại trang để cập nhật Dashboard
     },
 
-    // --- LOGIC TRA TỪ & LƯU TỪ ---
+
+
     async handleLookup() {
         const input = document.getElementById('vocab-input');
-        const word = input.value.trim();
-        if (!word) return;
+        const userQuery = input.value.trim();
+        if (!userQuery) return;
 
+        // 1. UI Loading (Feedback mục C)
         const resultUI = document.getElementById('vocab-result');
         resultUI.style.display = 'block';
-        document.getElementById('v-definition').innerHTML = '<div class="loader"></div> Đang phân tích...';
+        // Skeleton loading đơn giản
+        document.getElementById('v-definition').innerHTML = `
+        <div style="opacity: 0.6">
+            <p>🤖 AI đang phân tích ngữ nghĩa...</p>
+            <div class="loader"></div>
+        </div>
+    `;
+        // Reset nút lưu
+        const btnSave = document.getElementById('btn-save-word');
+        btnSave.innerText = "💾 Thêm vào SRS";
+        btnSave.disabled = true; // Chặn bấm khi đang load
+        btnSave.classList.remove('btn--outline');
+        btnSave.classList.add('btn--primary');
 
         try {
-            // Gọi AI lấy JSON cho dễ xử lý
-            const prompt = `Explain "${word}" in Vietnamese. Return ONLY a JSON object: {"mean": "nghĩa tiếng việt", "ipa": "/ipa/", "ex": "English example sentence (<b>word</b> highlighted)"}.`;
-            const jsonStr = await askAI(prompt, "You are a dictionary API.");
+            // 2. PROMPT THÔNG MINH (Feedback mục D - Giải quyết vấn đề Tra Việt ra Anh)
+            const prompt = `
+            Analyze this input: "${userQuery}".
+            Role: English Dictionary & Teacher.
+            Logic:
+            1. If input is Vietnamese (e.g., "trái cây"), translate to English ("Fruit") then define.
+            2. If input is English, define it directly.
             
-            // Parse JSON từ AI (đôi khi AI trả về text thừa, cần lọc)
-            const cleanJson = jsonStr.substring(jsonStr.indexOf('{'), jsonStr.lastIndexOf('}') + 1);
+            Return ONLY JSON format:
+            {
+                "word": "The English word (Capitalized)",
+                "ipa": "/IPA transcription/",
+                "type": "noun/verb/adj",
+                "meaning": "Short Vietnamese meaning",
+                "example_en": "Example sentence in English",
+                "example_vi": "Translation of example in Vietnamese",
+                "synonyms": "word1, word2"
+            }
+        `;
+
+            const jsonStr = await askAI(prompt, "You are a JSON Dictionary API.");
+
+            // Parse JSON (có xử lý lỗi nếu AI trả về markdown)
+            const cleanJson = jsonStr.replace(/```json|```/g, '').trim();
             const data = JSON.parse(cleanJson);
 
-            // Hiển thị
-            document.getElementById('v-word').innerText = word;
-            document.getElementById('v-ipa').innerText = data.ipa;
-            document.getElementById('v-definition').innerHTML = `
-                <p><b>Nghĩa:</b> ${data.mean}</p>
-                <p><b>Ví dụ:</b> ${data.ex}</p>
-            `;
+            // 3. Render Kết quả "Chuẩn học thuật" (Feedback mục D - 4, 5)
+            document.getElementById('v-word').innerText = data.word; // Luôn là tiếng Anh
+            document.getElementById('v-ipa').innerText = `${data.type} • ${data.ipa}`; // Thêm từ loại
 
-            // Lưu vào biến tạm
+            document.getElementById('v-definition').innerHTML = `
+            <div style="margin-top: 10px">
+                <p style="font-size: 1.1rem; font-weight: 500; color: var(--color-text-main)">
+                    👉 ${data.meaning}
+                </p>
+                <div style="margin-top: 12px; padding: 10px; background: #f8fafc; border-radius: 8px; border-left: 3px solid var(--color-primary)">
+                    <p style="color: #475569; font-style: italic">"${data.example_en}"</p>
+                    <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 4px">(${data.example_vi})</p>
+                </div>
+                ${data.synonyms ? `<p style="margin-top:8px; font-size:0.85rem; color:#64748b">Synonyms: ${data.synonyms}</p>` : ''}
+            </div>
+        `;
+
+            // Chuẩn bị dữ liệu để lưu
             this.tempWordData = {
-                word: word,
-                meaning: data.mean,
+                word: data.word, // Lưu từ tiếng Anh
+                meaning: data.meaning,
                 ipa: data.ipa,
-                example: data.ex,
-                // SRS Data khởi tạo
+                example: `<p>${data.example_en}</p><small>${data.example_vi}</small>`, // Lưu cả song ngữ
                 status: 'new',
-                dueDate: new Date().getTime(), // Học ngay hôm nay
+                dueDate: new Date().getTime(),
                 interval: 0,
-                ease: 2.5
+                seenCount: 0
             };
 
+            // Kích hoạt nút lưu
+            btnSave.disabled = false;
+
+            // 4. Check trùng ngay lập tức (Feedback mục 4)
+            // Gọi Storage để check xem từ này có chưa để update UI nút
+            const list = JSON.parse(localStorage.getItem('vocab_list') || '[]');
+            const exists = list.some(w => w.word.toLowerCase() === data.word.toLowerCase());
+            if (exists) {
+                btnSave.innerText = "✅ Đã có trong kho";
+                btnSave.classList.add('btn--outline');
+                btnSave.classList.remove('btn--primary');
+            }
+
         } catch (err) {
-            document.getElementById('v-definition').innerText = "Lỗi: " + err.message;
+            console.error(err);
+            document.getElementById('v-definition').innerText = "Lỗi AI: " + err.message;
+            btnSave.disabled = true;
         }
     },
 
     saveNewWord() {
-        if (!this.tempWordData) return;
-        
-        // Check trùng
-        const exists = this.vocabList.some(w => w.word.toLowerCase() === this.tempWordData.word.toLowerCase());
-        if (exists) {
-            alert("Từ này đã có trong kho!");
-            return;
-        }
+    if (!this.tempWordData) return;
 
-        this.vocabList.push(this.tempWordData);
-        this.saveToStorage();
-        alert("Đã lưu từ mới! Hãy ôn tập ngay nhé.");
+    // Sử dụng logic Storage đã có (Normalized Key đã được xử lý trong storage.js rồi)
+    //
+    const result = Storage.addVocab(this.tempWordData);
+
+    const btnSave = document.getElementById('btn-save-word');
+
+    if (result.status === 'updated') {
+        // Feedback người dùng khi trùng
+        alert(`Từ "${result.word.word}" đã được cập nhật lại vào lộ trình ôn tập! 🔄`);
+    } else {
+        // Feedback thành công
+        alert("Đã thêm vào SRS thành công! 🌱");
         
-        // Reset UI
-        document.getElementById('vocab-input').value = '';
-        document.getElementById('vocab-result').style.display = 'none';
-        this.renderDashboard(); // Cập nhật số liệu
-    },
+        // Cập nhật UI nút ngay lập tức để tránh spam click
+        btnSave.innerText = "✅ Đã lưu";
+        btnSave.disabled = true;
+        btnSave.classList.remove('btn--primary');
+        btnSave.classList.add('btn--outline');
+    }
+
+    // Reload Dashboard
+    this.loadData();
+    this.renderDashboard();
+    
+    // Clear input để nhập từ tiếp theo dễ hơn
+    document.getElementById('vocab-input').value = '';
+    document.getElementById('vocab-input').focus();
+},
 
     saveToStorage() {
         localStorage.setItem('vocab_list', JSON.stringify(this.vocabList));
