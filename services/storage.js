@@ -90,11 +90,14 @@ export const Storage = {
 
     getSettings() {
         const defaultSettings = {
-            apiKey: '',
-            dailyGoal: 10,     // 10 phút/ngày
-            level: 'A2',       // Trình độ hiện tại
-            theme: 'light'
-        };
+        apiKey: '',
+        dailyGoal: 10,
+        level: 'A1',
+        username: 'Student',      // Mới
+        vocabLimitNew: 5,         // Mới
+        vocabLimitReview: 10,     // Mới
+        theme: 'light'
+    };
         const raw = localStorage.getItem(this.SETTINGS_KEY);
         if (!raw) return defaultSettings;
         
@@ -113,5 +116,84 @@ export const Storage = {
     getApiKey() {
         const settings = this.getSettings();
         return settings.apiKey || '';
+    },
+
+
+    /**
+     * ✅ AI HISTORY STORAGE
+     * Lưu trữ tập trung mọi dữ liệu AI tạo ra
+     */
+    HISTORY_KEY: 'wordstock_ai_history',
+
+    getHistory(filterType = 'all', searchQuery = '') {
+        const raw = localStorage.getItem(this.HISTORY_KEY);
+        let list = raw ? JSON.parse(raw) : [];
+
+        // 1. Filter theo loại
+        if (filterType !== 'all') {
+            list = list.filter(item => item.type === filterType);
+        }
+
+        // 2. Search
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            list = list.filter(item => 
+                item.title.toLowerCase().includes(q) || 
+                (item.snippet && item.snippet.toLowerCase().includes(q))
+            );
+        }
+
+        // Sắp xếp mới nhất trước
+        return list.sort((a, b) => b.createdAt - a.createdAt);
+    },
+
+    /**
+     * Thêm item vào lịch sử (Có chống trùng lặp)
+     * @param {string} type - 'vocab' | 'listening' | 'speaking' | 'tip'
+     * @param {string} title - Tiêu đề hiển thị
+     * @param {object} content - Dữ liệu chi tiết (full json)
+     * @param {string} snippet - Đoạn text ngắn để preview
+     */
+    addToHistory(type, title, content, snippet = '') {
+        const list = this.getHistory();
+        
+        // Tạo Normalized Key để check trùng
+        // Vd: vocab_apple, listening_thoi-quen
+        const normalize = (str) => str.trim().toLowerCase().replace(/\s+/g, '-');
+        const key = `${type}_${normalize(title)}`;
+
+        const existingIndex = list.findIndex(i => i.key === key);
+
+        const newItem = {
+            id: Date.now().toString(),
+            key: key,
+            type: type,
+            title: title,
+            content: content,
+            snippet: snippet,
+            createdAt: Date.now(),
+            version: 1
+        };
+
+        if (existingIndex > -1) {
+            // Nếu đã có -> Update lại nội dung mới nhất & đưa lên đầu
+            list.splice(existingIndex, 1);
+            list.unshift(newItem);
+        } else {
+            // Chưa có -> Thêm mới
+            list.unshift(newItem);
+        }
+
+        // Giới hạn lưu trữ (ví dụ 200 items gần nhất để nhẹ app)
+        if (list.length > 200) list.pop();
+
+        localStorage.setItem(this.HISTORY_KEY, JSON.stringify(list));
+    },
+
+    deleteHistoryItem(id) {
+        let list = this.getHistory();
+        list = list.filter(item => item.id !== id);
+        localStorage.setItem(this.HISTORY_KEY, JSON.stringify(list));
     }
+
 };

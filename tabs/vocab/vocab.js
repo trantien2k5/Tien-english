@@ -27,26 +27,6 @@ export default {
         });
     },
 
-    saveNewWord() {
-        if (!this.tempWordData) return;
-
-        // --- DÙNG LOGIC MỚI TỪ STORAGE ---
-        const result = Storage.addVocab(this.tempWordData);
-
-        if (result.status === 'updated') {
-            alert(`Từ "${result.word.word}" đã có trong kho! \n(Đã tăng số lần gặp lên: ${result.word.seenCount})`);
-        } else {
-            alert("Đã lưu từ mới thành công! 🎉");
-        }
-
-        // Reset UI
-        document.getElementById('vocab-input').value = '';
-        document.getElementById('vocab-result').style.display = 'none';
-
-        // Reload dữ liệu để cập nhật Dashboard
-        this.loadData();
-        this.renderDashboard();
-    },
 
     bindEvents() {
         // 1. Sự kiện Tra từ

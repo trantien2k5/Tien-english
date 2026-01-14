@@ -52,3 +52,153 @@
 .settings-footer {
     text-align: center; color: #94a3b8; font-size: 0.9rem; margin-top: 30px;
 }
+
+/* Label nhóm */
+.setting-label {
+    font-size: 0.85rem; font-weight: 700; color: var(--color-text-muted);
+    margin: 20px 0 8px 10px; text-transform: uppercase;
+}
+
+/* Container Group */
+.setting-group {
+    background: white; border-radius: 12px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+}
+
+/* Item dòng */
+.setting-item {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.2s;
+}
+.setting-item:last-child { border-bottom: none; }
+
+/* Header (Phần luôn hiện) */
+.setting-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px; cursor: pointer;
+}
+.setting-header:active { background-color: #f8fafc; }
+
+/* Left Side */
+.s-left { display: flex; align-items: center; gap: 12px; }
+.s-icon { font-size: 1.2rem; }
+.s-title { font-weight: 600; font-size: 0.95rem; color: var(--color-text-main); }
+
+/* Right Side */
+.s-right { display: flex; align-items: center; gap: 8px; }
+.s-value { font-size: 0.85rem; color: var(--color-primary); font-weight: 500; }
+.s-chevron { font-size: 0.8rem; color: #cbd5e1; transition: transform 0.3s; }
+
+/* Active State (Khi mở) */
+.setting-item.active .s-chevron { transform: rotate(90deg); }
+.setting-item.active .setting-header { background-color: #f8fafc; }
+
+/* Body (Accordion Content) */
+.setting-body {
+    display: none; /* Mặc định ẩn */
+    padding: 0 15px 20px 15px;
+    background-color: #f8fafc;
+    border-top: 1px dashed #e2e8f0;
+    animation: slideDown 0.3s ease;
+}
+.setting-item.active .setting-body { display: block; }
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Utilities trong body */
+.s-note { font-size: 0.8rem; color: #64748b; margin-bottom: 10px; font-style: italic; }
+.text-danger { color: var(--color-danger) !important; }
+.mb-2 { margin-bottom: 10px; }
+.btn-sm { padding: 8px 15px; font-size: 0.85rem; width: auto; }
+
+.app-info { text-align: center; margin-top: 30px; color: #cbd5e1; font-size: 0.8rem; }
+
+/* --- SUB-VIEW (Lớp phủ toàn màn hình tab) --- */
+.sub-view {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--color-bg); z-index: 2000;
+    display: none; flex-direction: column;
+    animation: slideInRight 0.3s ease;
+}
+.sub-view.active { display: flex; }
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+/* Header của Sub-view */
+.sub-header {
+    height: 60px; background: white; border-bottom: 1px solid #e2e8f0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 15px; font-weight: 700; font-size: 1.1rem;
+}
+.btn-icon { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 5px; }
+
+/* Controls (Search + Filter) */
+.lib-controls { padding: 15px; background: white; box-shadow: 0 4px 6px -4px rgba(0,0,0,0.05); }
+
+.search-box {
+    position: relative; margin-bottom: 12px;
+}
+.search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+.search-box input {
+    width: 100%; padding: 10px 10px 10px 36px;
+    border: 1px solid #e2e8f0; border-radius: 20px;
+    background: #f8fafc; font-size: 0.9rem; outline: none;
+}
+
+.filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+.filter-pill {
+    white-space: nowrap; padding: 6px 14px; border-radius: 20px;
+    border: 1px solid #e2e8f0; background: white; color: #64748b;
+    font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+}
+.filter-pill.active {
+    background: var(--color-primary); color: white; border-color: var(--color-primary);
+}
+
+/* List Items */
+.lib-list-container { flex: 1; overflow-y: auto; padding: 15px; }
+
+.lib-card {
+    background: white; border-radius: 12px; padding: 15px;
+    margin-bottom: 15px; border: 1px solid #f1f5f9;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03); cursor: pointer;
+    transition: transform 0.2s;
+}
+.lib-card:active { transform: scale(0.98); }
+
+.lc-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.lc-badge { font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
+
+/* Màu Badge theo loại */
+.badge-vocab { background: #e0e7ff; color: #4338ca; }
+.badge-listening { background: #ffedd5; color: #9a3412; }
+.badge-speaking { background: #fee2e2; color: #991b1b; }
+
+.lc-title { font-weight: 700; color: var(--color-text-main); font-size: 1rem; }
+.lc-snippet { font-size: 0.85rem; color: #64748b; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.lc-date { font-size: 0.75rem; color: #cbd5e1; margin-top: 10px; text-align: right; }
+
+/* Modal Detail Styles */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 3000;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+}
+.modal-card {
+    background: white; width: 90%; max-width: 500px; max-height: 80vh;
+    border-radius: 16px; display: flex; flex-direction: column;
+    animation: zoomIn 0.2s ease;
+}
+@keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.modal-header { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+.modal-body { padding: 20px; overflow-y: auto; }
+.modal-footer { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; justify-content: flex-end; }
+.btn-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; }

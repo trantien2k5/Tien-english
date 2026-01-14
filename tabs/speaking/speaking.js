@@ -65,7 +65,7 @@ export default {
         // Chuyển sang màn hình loading kết quả
         document.getElementById('record-area').style.display = 'none';
         document.getElementById('result-area').style.display = 'block';
-        
+
         // Hiển thị tạm thời
         document.getElementById('user-transcript-html').innerHTML = `"${userText}"`;
         document.getElementById('score-comment').innerHTML = '<div class="loader"></div> Đang chấm điểm...';
@@ -104,7 +104,7 @@ export default {
         const scoreEl = document.getElementById('score-number');
         scoreEl.innerText = data.score;
         const circle = document.querySelector('.score-circle');
-        
+
         if (data.score >= 8) circle.style.borderColor = 'var(--color-success)';
         else if (data.score >= 5) circle.style.borderColor = 'var(--color-warning)';
         else circle.style.borderColor = 'var(--color-danger)';
@@ -136,6 +136,14 @@ export default {
         // 4. Native Suggestions
         const suggestList = document.getElementById('suggestion-list');
         suggestList.innerHTML = data.better_versions.map(s => `<li>${s}</li>`).join('');
+
+        // Lưu kết quả chấm điểm
+        Storage.addToHistory(
+            'speaking',
+            `Practice: Score ${data.score}/10`,
+            data,
+            `User: "${userText}" -> AI: ${data.comment}`
+        );
     },
 
     resetUI() {

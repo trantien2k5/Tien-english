@@ -80,6 +80,16 @@ export default {
             console.error(err);
             loader.innerHTML = `<p class="text-danger">Lỗi: ${err.message}. Hãy thử lại!</p>`;
         }
+
+        // Sau khi Storage.addListeningHistory(this.currentData);
+        Storage.addToHistory(
+            'listening',
+            this.currentData.topic,
+            this.currentData,
+            `Dialogue: ${this.currentData.dialogue.substring(0, 50)}...`
+        );
+
+
     },
 
     renderLesson() {
