@@ -121,14 +121,27 @@ export default {
             const rawResponse = await askAI(prompt, "You are an English teacher JSON API.");
 
             // Parse JSON từ AI (xử lý trường hợp AI trả về markdown code block)
-            const jsonStr = rawResponse.replace(/```json|```/g, '').trim();
-            this.currentData = JSON.parse(jsonStr);
+            // PATCH_v2: Fix JSON Parse & Move Logic inside Try
+            let jsonStr = rawResponse.replace(/```json|```/g, '').trim();
+            // Lấy đúng phần JSON Object (tránh text thừa)
+            const firstBrace = jsonStr.indexOf('{');
+            const lastBrace = jsonStr.lastIndexOf('}');
+            if (firstBrace >= 0 && lastBrace >= 0) {
+                jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+            }
 
+            this.currentData = JSON.parse(jsonStr);
             this.currentData.topic = document.getElementById('listen-topic').value;
             this.currentData.createdAt = new Date().toLocaleDateString();
 
-            // Lưu vào Storage
+            // Lưu Storage & History (Chỉ chạy khi parse thành công)
             Storage.addListeningHistory(this.currentData);
+            Storage.addToHistory(
+                'listening',
+                this.currentData.topic,
+                this.currentData,
+                `Dialogue: ${this.currentData.dialogue?.[0]?.text || 'Audio lesson'}`
+            );
 
             this.renderLesson();
             loader.style.display = 'none';
@@ -136,17 +149,9 @@ export default {
             quizArea.style.display = 'block';
 
         } catch (err) {
-            console.error(err);
-            loader.innerHTML = `<p class="text-danger">Lỗi: ${err.message}. Hãy thử lại!</p>`;
+            console.error("AI Gen Error:", err);
+            loader.innerHTML = `<p class="text-danger" style="padding:20px">⚠️ Lỗi xử lý dữ liệu AI: ${err.message}<br>Hãy thử lại!</p>`;
         }
-
-        // Sau khi Storage.addListeningHistory(this.currentData);
-        Storage.addToHistory(
-            'listening',
-            this.currentData.topic,
-            this.currentData,
-            `Dialogue: ${this.currentData.dialogue.substring(0, 50)}...`
-        );
 
 
     },
