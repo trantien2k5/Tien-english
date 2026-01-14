@@ -1,168 +1,234 @@
 import { Storage } from '../../services/storage.js';
 
 export default {
-    // Cache
+    // Cache Elements
     els: {},
     settings: {},
-    currentFilter: 'all', // State cho bộ lọc
+    currentFilter: 'all',
 
     init() {
         this.cacheDOM();
         this.loadSettings();
-        this.renderPreviews();
         this.bindEvents();
         
-        // Init Library (Code mới)
+        // Init Library
         this.updateLibCount(); 
         this.bindLibraryEvents();
     },
 
     cacheDOM() {
         this.els = {
-            // --- Settings UI ---
+            // Accordion Items
             items: document.querySelectorAll('.setting-item'),
-            userName: document.getElementById('user-name'),
-            userLevel: document.getElementById('user-level'),
-            goalOptions: document.querySelectorAll('#goal-options .btn-option'),
-            vocabNew: document.getElementById('vocab-limit-new'),
-            vocabReview: document.getElementById('vocab-limit-review'),
+            
+            // Profile & Display
+            dispName: document.getElementById('disp-name'),
+            dispLevel: document.getElementById('disp-level'),
+            dispStreak: document.getElementById('disp-streak'),
+            
+            // Inputs: Personalization
+            inpUsername: document.getElementById('inp-username'),
+            inpLevel: document.getElementById('inp-level'),
+            inpGoalTarget: document.getElementById('inp-goal-target'),
+            inpDailySlider: document.getElementById('inp-daily-slider'),
+            valDaily: document.getElementById('val-daily'),
+            inpReminder: document.getElementById('inp-reminder'),
+            
+            // Vocab
+            modeBtns: document.querySelectorAll('.mode-btn'),
+            valVNew: document.getElementById('val-v-new'),
+            valVReview: document.getElementById('val-v-review'),
+
+            // Learning & Experience
+            inpAutoNext: document.getElementById('inp-auto-next'),
+            inpShowScript: document.getElementById('inp-show-script'),
+            inpDarkMode: document.getElementById('inp-dark-mode'),
+            inpSound: document.getElementById('inp-sound'),
+            
+            // System
             apiKey: document.getElementById('api-key'),
+            inpAiMode: document.getElementById('inp-ai-mode'),
             btnSaveKey: document.getElementById('save-key'),
             btnDeleteKey: document.getElementById('delete-key'),
             btnEye: document.getElementById('btn-toggle-eye'),
             btnExport: document.getElementById('btn-export'),
             fileImport: document.getElementById('file-import'),
             btnReset: document.getElementById('btn-reset-all'),
-            // Elements hiển thị preview
-            prevProfile: document.getElementById('preview-profile'),
-            prevGoal: document.getElementById('preview-goal'),
-            prevVocab: document.getElementById('preview-vocab'),
-            prevAi: document.getElementById('preview-ai'),
+
+            // Chips Previews
+            chipGoal: document.getElementById('chip-goal'),
+            chipDaily: document.getElementById('chip-daily'),
+            chipVocab: document.getElementById('chip-vocab'),
+            chipAi: document.getElementById('chip-ai'),
         };
     },
 
     loadSettings() {
         this.settings = Storage.getSettings();
-
-        // Fill Data vào Inputs
-        this.els.userName.value = this.settings.username || '';
-        this.els.userLevel.value = this.settings.level || 'A1';
-        this.els.vocabNew.value = this.settings.vocabLimitNew || 5;
-        this.els.vocabReview.value = this.settings.vocabLimitReview || 10;
-
-        if (this.settings.apiKey) {
-            this.els.apiKey.value = this.settings.apiKey;
-            this.els.btnDeleteKey.style.display = 'block';
-            this.els.btnSaveKey.innerText = "Cập nhật";
-        } else {
-            this.els.btnDeleteKey.style.display = 'none';
-        }
-
-        // Active Goal Button
-        this.els.goalOptions.forEach(btn => {
-            btn.classList.toggle('active', parseInt(btn.dataset.val) === (this.settings.dailyGoal || 10));
-        });
-    },
-
-    // 🔥 Cập nhật dòng chữ bên phải (Preview)
-    renderPreviews() {
+        
         // 1. Profile
-        const name = this.settings.username || 'Student';
-        this.els.prevProfile.innerText = `${name} • ${this.settings.level || 'A1'}`;
+        if(this.els.inpUsername) this.els.inpUsername.value = this.settings.username || 'Student';
+        if(this.els.inpLevel) this.els.inpLevel.value = this.settings.level || 'A1';
+        if(this.els.inpGoalTarget) this.els.inpGoalTarget.value = this.settings.goalTarget || 'communication';
+        
+        // Stats Display
+        if(this.els.dispName) this.els.dispName.innerText = this.settings.username || 'Student';
+        if(this.els.dispLevel) this.els.dispLevel.innerText = this.settings.level || 'A1';
+        if(this.els.dispStreak) this.els.dispStreak.innerText = Storage.getStats().streak || 0;
 
         // 2. Goal
-        this.els.prevGoal.innerText = `${this.settings.dailyGoal || 10} phút`;
+        const goal = this.settings.dailyGoal || 15;
+        if(this.els.inpDailySlider) this.els.inpDailySlider.value = goal;
+        if(this.els.valDaily) this.els.valDaily.innerText = goal;
+        if(this.els.inpReminder) this.els.inpReminder.checked = !!this.settings.reminderTime;
 
         // 3. Vocab
-        this.els.prevVocab.innerText = `Mới: ${this.settings.vocabLimitNew || 5} • Ôn: ${this.settings.vocabLimitReview || 10}`;
+        const mode = this.settings.vocabMode || 'balanced';
+        this.updateVocabUI(mode);
+        this.els.modeBtns.forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
 
-        // 4. AI
+        // 4. Learning & Experience
+        if(this.els.inpAutoNext) this.els.inpAutoNext.checked = this.settings.autoPlayNext;
+        if(this.els.inpShowScript) this.els.inpShowScript.checked = this.settings.showScriptAfter;
+        
+        if(this.els.inpDarkMode) {
+            this.els.inpDarkMode.checked = this.settings.darkMode;
+            document.body.classList.toggle('dark-theme', this.settings.darkMode);
+        }
+        
+        if(this.els.inpSound) this.els.inpSound.checked = this.settings.soundEffects;
+
+        // 5. System
+        if(this.els.inpAiMode) this.els.inpAiMode.value = this.settings.aiMode || 'speed';
         if (this.settings.apiKey) {
-            this.els.prevAi.innerText = "Đã lưu ✅";
-            this.els.prevAi.style.color = "var(--color-success)";
+            if(this.els.apiKey) this.els.apiKey.value = this.settings.apiKey;
+            if(this.els.btnDeleteKey) this.els.btnDeleteKey.style.display = 'block';
+            if(this.els.btnSaveKey) this.els.btnSaveKey.innerText = "Cập nhật";
         } else {
-            this.els.prevAi.innerText = "Chưa cấu hình ⚠️";
-            this.els.prevAi.style.color = "var(--color-warning)";
+            if(this.els.btnDeleteKey) this.els.btnDeleteKey.style.display = 'none';
+        }
+
+        this.renderPreviews();
+    },
+
+    updateVocabUI(mode) {
+        let newCount = 5, revCount = 10;
+        if(mode === 'light') { newCount=3; revCount=5; }
+        if(mode === 'intense') { newCount=10; revCount=20; }
+        
+        if(this.els.valVNew) this.els.valVNew.innerText = newCount;
+        if(this.els.valVReview) this.els.valVReview.innerText = revCount;
+    },
+
+    renderPreviews() {
+        const goalMap = { communication: '🗣️ Giao tiếp', ielts: '🎓 IELTS', work: '💼 Đi làm', travel: '✈️ Du lịch' };
+        
+        if(this.els.chipGoal) this.els.chipGoal.innerText = goalMap[this.settings.goalTarget] || 'Chưa chọn';
+        if(this.els.chipDaily) this.els.chipDaily.innerText = `${this.settings.dailyGoal || 15} phút`;
+        
+        const mode = this.settings.vocabMode || 'balanced';
+        if(this.els.chipVocab) this.els.chipVocab.innerText = mode.charAt(0).toUpperCase() + mode.slice(1);
+        
+        if(this.els.chipAi) {
+            if (this.settings.apiKey) {
+                this.els.chipAi.innerText = "Đã lưu ✅";
+                this.els.chipAi.classList.add('green');
+            } else {
+                this.els.chipAi.innerText = "Chưa có";
+                this.els.chipAi.classList.remove('green');
+            }
         }
     },
 
     save(key, value) {
-        // Helper save nhanh & update preview
         const obj = {};
         obj[key] = value;
         Storage.saveSettings(obj);
-        this.settings = Storage.getSettings(); // Reload local
-        this.renderPreviews(); // Update UI ngay
+        this.settings = Storage.getSettings();
+        this.renderPreviews(); // Update UI
     },
 
     bindEvents() {
-        // 1. Accordion Logic (Bấm header -> Mở body)
+        // Accordion
         this.els.items.forEach(item => {
-            const header = item.querySelector('.setting-header');
-            header.addEventListener('click', () => {
-                // Đóng các item khác (Optional - để UX gọn hơn)
-                this.els.items.forEach(i => {
-                    if (i !== item) i.classList.remove('active');
-                });
-                // Toggle item hiện tại
+            item.querySelector('.setting-header')?.addEventListener('click', () => {
+                this.els.items.forEach(i => i !== item && i.classList.remove('active'));
                 item.classList.toggle('active');
             });
         });
 
-        // 2. Profile Change (Auto Save)
-        this.els.userName.addEventListener('change', (e) => this.save('username', e.target.value.trim()));
-        this.els.userLevel.addEventListener('change', (e) => this.save('level', e.target.value));
+        // --- Inputs Change Events (SAFE MODE: Use ?. to prevent crash) ---
+        
+        this.els.inpUsername?.addEventListener('change', (e) => this.save('username', e.target.value));
+        this.els.inpLevel?.addEventListener('change', (e) => this.save('level', e.target.value));
+        this.els.inpGoalTarget?.addEventListener('change', (e) => this.save('goalTarget', e.target.value));
 
-        // 3. Goal Change
-        this.els.goalOptions.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                // UI
-                this.els.goalOptions.forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                // Save
-                this.save('dailyGoal', parseInt(e.target.dataset.val));
+        this.els.inpDailySlider?.addEventListener('input', (e) => {
+            if(this.els.valDaily) this.els.valDaily.innerText = e.target.value;
+        });
+        this.els.inpDailySlider?.addEventListener('change', (e) => this.save('dailyGoal', parseInt(e.target.value)));
+        this.els.inpReminder?.addEventListener('change', (e) => this.save('reminderTime', e.target.checked ? "20:00" : ""));
+
+        this.els.modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.dataset.mode;
+                this.updateVocabUI(mode);
+                this.save('vocabMode', mode);
+                this.loadSettings(); 
             });
         });
 
-        // 4. Vocab Plan Change
-        this.els.vocabNew.addEventListener('change', (e) => this.save('vocabLimitNew', parseInt(e.target.value)));
-        this.els.vocabReview.addEventListener('change', (e) => this.save('vocabLimitReview', parseInt(e.target.value)));
+        const bindToggle = (el, key) => {
+            if(el) el.addEventListener('change', (e) => this.save(key, e.target.checked));
+        };
+        bindToggle(this.els.inpAutoNext, 'autoPlayNext');
+        bindToggle(this.els.inpShowScript, 'showScriptAfter');
+        bindToggle(this.els.inpSound, 'soundEffects');
+        
+        this.els.inpDarkMode?.addEventListener('change', (e) => {
+            this.save('darkMode', e.target.checked);
+            document.body.classList.toggle('dark-theme', e.target.checked);
+        });
 
-        // 5. AI Key Logic (Giữ nguyên logic cũ nhưng gọn hơn)
-        this.els.btnSaveKey.addEventListener('click', () => {
+        this.els.inpAiMode?.addEventListener('change', (e) => this.save('aiMode', e.target.value));
+
+        // Buttons
+        this.els.btnSaveKey?.addEventListener('click', () => {
             const key = this.els.apiKey.value.trim();
-            if (!key.startsWith('sk-')) {
-                if (!confirm("Key không đúng định dạng 'sk-'. Vẫn lưu?")) return;
-            }
             Storage.saveSettings({ apiKey: key });
-            this.loadSettings(); // Reload để hiện nút Xóa
-            this.renderPreviews();
+            this.loadSettings();
             alert("Đã lưu API Key! 🤖");
         });
-
-        this.els.btnDeleteKey.addEventListener('click', () => {
-            if (confirm("Xóa API Key?")) {
+        
+        this.els.btnDeleteKey?.addEventListener('click', () => {
+            if(confirm("Xóa API Key?")) {
                 Storage.saveSettings({ apiKey: '' });
-                this.els.apiKey.value = '';
+                if(this.els.apiKey) this.els.apiKey.value = '';
                 this.loadSettings();
-                this.renderPreviews();
             }
         });
 
-        this.els.btnEye.addEventListener('click', () => {
-            const type = this.els.apiKey.type === 'password' ? 'text' : 'password';
-            this.els.apiKey.type = type;
+        this.els.btnEye?.addEventListener('click', () => {
+            if(this.els.apiKey) this.els.apiKey.type = this.els.apiKey.type === 'password' ? 'text' : 'password';
         });
 
-        // 6. Export / Import
-        this.els.btnExport.addEventListener('click', () => this.handleExport());
-        this.els.fileImport.addEventListener('change', (e) => this.handleImport(e));
-
-        // 7. Reset App
-        this.els.btnReset.addEventListener('click', () => {
-            if (confirm("⚠️ NGUY HIỂM: Bạn có chắc chắn muốn xóa TOÀN BỘ dữ liệu học tập? Hành động này không thể hoàn tác!")) {
+        this.els.btnExport?.addEventListener('click', () => this.handleExport());
+        this.els.fileImport?.addEventListener('change', (e) => this.handleImport(e));
+        this.els.btnReset?.addEventListener('click', () => {
+            if (confirm("⚠️ Xóa TOÀN BỘ dữ liệu?")) {
                 localStorage.clear();
                 location.reload();
+            }
+        });
+        
+        // Edit Profile Button (Header)
+        const btnEdit = document.getElementById('btn-edit-profile');
+        if(btnEdit) btnEdit.addEventListener('click', () => {
+            const itemProfile = document.getElementById('item-profile');
+            if(itemProfile) {
+                // Mở accordion profile và scroll tới đó
+                itemProfile.classList.add('active');
+                itemProfile.scrollIntoView({behavior: 'smooth'});
             }
         });
     },
@@ -200,38 +266,41 @@ export default {
                 alert("File lỗi! Không thể import.");
             }
         };
-        if (file) {
-
-            reader.readAsText(file);
-        }
+        reader.readAsText(file);
     },
 
     // --- LIBRARY LOGIC ---
     updateLibCount() {
-        const count = Storage.getHistory().length;
-        const el = document.getElementById('lib-count');
-        if(el) el.innerText = `${count} mục`;
+        const list = Storage.getHistory();
+        const count = list.length;
+        
+        // Chip Header
+        const chip = document.getElementById('lib-count');
+        if(chip) chip.innerText = `${count} mục`;
+
+        // Detail
+        const detail = document.getElementById('lib-count-detail');
+        if(detail) detail.innerText = `${count} items`;
     },
 
     bindLibraryEvents() {
-        // Cache lại elements cho chắc chắn (Lazy cache)
         const els = {
-            itemLib: document.getElementById('item-ai-lib'),
+            btnOpen: document.querySelector('#item-ai-lib .btn--primary'), // Nút Mở thư viện trong body accordion
             view: document.getElementById('ai-library-view'),
             close: document.getElementById('btn-close-lib'),
-            list: document.getElementById('lib-list'),
             search: document.getElementById('lib-search'),
             pills: document.querySelectorAll('.filter-pill')
         };
 
-        // 1. Open/Close Library
-        if(els.itemLib) els.itemLib.addEventListener('click', () => {
-            els.view.classList.add('active');
+        if(els.btnOpen) els.btnOpen.addEventListener('click', () => {
+            if(els.view) els.view.classList.add('active');
             this.renderLibraryList();
         });
-        if(els.close) els.close.addEventListener('click', () => els.view.classList.remove('active'));
+        
+        if(els.close) els.close.addEventListener('click', () => els.view?.classList.remove('active'));
 
-        // 2. Search & Filter
+        // (Deleted Modal Logic - Settings is now a standard tab)
+
         if(els.search) els.search.addEventListener('input', (e) => this.renderLibraryList(e.target.value));
         
         if(els.pills) els.pills.forEach(btn => {

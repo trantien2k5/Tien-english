@@ -55,6 +55,38 @@
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
+/* --- DARK THEME OVERRIDE --- */
+body.dark-theme {
+    --color-bg: #0f172a;       /* Slate 900 */
+    --color-surface: #1e293b;  /* Slate 800 */
+    
+    --color-text-main: #f1f5f9; /* Slate 100 */
+    --color-text-muted: #94a3b8; /* Slate 400 */
+    
+    --color-border: #334155;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.5);
+}
+
+/* Fix màu chữ cho các thành phần đặc biệt trong Dark Mode */
+body.dark-theme .form-input, 
+body.dark-theme select {
+    background: #334155; color: white; border-color: #475569;
+}
+body.dark-theme .setting-row,
+body.dark-theme .setting-header {
+    background: #1e293b; border-color: #334155;
+}
+body.dark-theme .setting-body {
+    background: #0f172a;
+}
+body.dark-theme .profile-card {
+    background: #1e293b; border-color: #334155;
+}
+body.dark-theme .s-chip {
+    background: #334155; color: #cbd5e1;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;

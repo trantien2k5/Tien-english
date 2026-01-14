@@ -103,14 +103,31 @@ export const Storage = {
 
     getSettings() {
         const defaultSettings = {
-        apiKey: '',
-        dailyGoal: 10,
-        level: 'A1',
-        username: 'Student',      // Mới
-        vocabLimitNew: 5,         // Mới
-        vocabLimitReview: 10,     // Mới
-        theme: 'light'
-    };
+            // 1. Profile & Goal
+            apiKey: '',
+            username: 'Student',
+            level: 'A1',
+            goalTarget: 'communication', // communication, ielts, work...
+            dailyGoal: 15, // phút
+            reminderTime: '', // "20:00"
+
+            // 2. Vocab Plan
+            vocabLimitNew: 5,
+            vocabLimitReview: 10,
+            vocabMode: 'balanced', // light, balanced, intense
+
+            // 3. Learning Settings
+            autoPlayNext: true,
+            autoReplayWrong: true,
+            showScriptAfter: true,
+            soundEffects: true,
+            darkMode: false,
+
+            // 4. System
+            aiMode: 'speed', // speed, quality, exam
+            accent: 'us', // us, uk
+            theme: 'light'
+        };
         const raw = localStorage.getItem(this.SETTINGS_KEY);
         if (!raw) return defaultSettings;
         
