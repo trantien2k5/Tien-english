@@ -172,26 +172,26 @@ export default {
         try {
             // --- PROMPT KỸ THUẬT (Updated v2: Level + SRS) ---
             const level = document.getElementById('listen-level').value;
-            // PATCH_v3: Added Dictation Challenge
+            // PATCH_v4: IELTS Standard Prompt (Longer + Distractors)
             const prompt = `
-                Create a listening lesson. Topic: "${topic}". Level: ${level}.
-                Structure:
-                1. Dialogue: 6-10 turns. Natural.
-                2. 3 Quiz questions (MCQ).
-                3. 3 Key phrases for SRS.
-                4. 1 Dictation sentence (taken from dialogue, replace 2-3 hard words with underscores).
+                Act as IELTS Content Generator. Topic: "${topic}". Level: ${level}.
+                Generate a Listening Part 1 or 2 transcript.
+                Requirements:
+                1. Length: Long conversation (approx 200-250 words, 12-16 turns).
+                2. Complexity: Include "distractors" (e.g., speaker corrects themselves: "It is $50... oh sorry, $15") and paraphrasing.
+                3. Structure:
+                   - Dialogue: Natural, native flow.
+                   - 3 MCQ Questions: Tricky options (traps).
+                   - 3 SRS Vocab: Band 7.0+ words.
+                   - 1 Dictation: Fast connected speech sentence.
 
-                Return ONLY valid JSON:
+                Return ONLY valid JSON (RFC8259):
                 {
                     "topic_en": "Topic Name",
                     "dialogue": [ {"speaker": "A", "text": "..."} ],
-                    "questions": [ {"q": "...", "options": ["..."], "correct": 0, "explain": "..."} ],
+                    "questions": [ {"q": "...", "options": ["..."], "correct": 0, "explain": "Explain the distractor/trap."} ],
                     "srs_vocab": [ {"word": "...", "meaning": "..."} ],
-                    "dictation": {
-                        "full_text": "I want to buy a coffee",
-                        "masked_text": "I want to ___ a ___",
-                        "answers": ["buy", "coffee"]
-                    }
+                    "dictation": { "full_text": "...", "masked_text": "...", "answers": ["..."] }
                 }
             `;
 
