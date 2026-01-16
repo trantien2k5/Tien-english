@@ -38,16 +38,31 @@ export default {
         `;
 
         try {
+            // PATCH_v3: Parse an toàn + Lưu History
             const raw = await askAI(prompt, "You are a Reading Generator JSON API.");
-            const data = JSON.parse(raw.replace(/```json|```/g, '').trim());
+            const jsonStr = raw.replace(/```json|```/g, '').trim();
+            const data = JSON.parse(jsonStr);
+
+            // Add Metadata
+            data.id = Date.now();
+            data.topic = topic;
+            data.createdAt = Date.now();
+
+            // 1. Lưu vào Storage (Giống Listening)
+            Storage.addToHistory('reading', data.title, data, `Topic: ${topic} (${level})`);
+
             this.renderReading(data);
         } catch (e) {
-            alert("Lỗi AI: " + e.message);
-            location.reload();
+            console.error(e);
+            alert("Lỗi AI hoặc JSON: " + e.message);
+            document.getElementById('reading-loader').style.display = 'none';
+            document.getElementById('reading-setup').style.display = 'block';
         }
     },
 
     renderReading(data) {
+        // PATCH_v3: Scroll lên đầu khi render
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         this.currentQuestions = data.questions;
         
         document.getElementById('reading-loader').style.display = 'none';
@@ -103,6 +118,14 @@ export default {
             }
         });
 
-        alert(`Kết quả: ${score}/${this.currentQuestions.length} câu đúng! 🎉`);
+        // PATCH_v3: Update Stats & Gamification
+        if (score === this.currentQuestions.length) {
+            // Nếu đúng hết -> Thưởng EXP (Giả lập)
+            let exp = parseInt(localStorage.getItem('user_exp') || 0);
+            localStorage.setItem('user_exp', exp + 20);
+            alert(`Tuyệt đối! ${score}/${this.currentQuestions.length} câu đúng. +20 EXP 🌟`);
+        } else {
+            alert(`Kết quả: ${score}/${this.currentQuestions.length} câu đúng! 🎉`);
+        }
     }
 };

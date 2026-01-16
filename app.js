@@ -5,8 +5,11 @@
 
 const APP_CONTAINER = document.getElementById('app');
 
-// PATCH_v2: SPA Core - Cache Views để hết lag
+// PATCH_v3: Fix Audio Leak + SPA Core
 async function loadTab(tabName) {
+    // 0. STOP AUDIO TOÀN HỆ THỐNG (Quan trọng)
+    window.speechSynthesis.cancel(); 
+
     // 1. Ẩn tất cả tab hiện tại
     Array.from(APP_CONTAINER.children).forEach(child => child.style.display = 'none');
 
