@@ -10,14 +10,13 @@ const API_URL = "https://api.openai.com/v1/chat/completions";
  */
 // PATCH_v2
 // PATCH_v2
-export async function askAI(prompt, systemRole = "You are a helpful English tutor.") {
+// PATCH_v2
+export async function askAI(prompt, systemRole = "You are a helpful English tutor.", returnJson = false) {
     // ⚠️ QUAN TRỌNG: Thay dòng dưới bằng Link Cloudflare Worker của bạn
     const CLOUDFLARE_WORKER_URL = "https://openai-proxy.trantien.workers.dev"; 
     
-    // Logic: Nếu có Key cá nhân (Settings) -> Dùng Key. Nếu không -> Dùng Cloudflare.
     const personalKey = Storage.getApiKey();
     const usePersonalKey = personalKey && personalKey.trim() !== '';
-    
     const endpoint = usePersonalKey ? API_URL : CLOUDFLARE_WORKER_URL;
     
     if (!usePersonalKey && endpoint.includes("YOUR_NAME")) {
@@ -37,7 +36,7 @@ export async function askAI(prompt, systemRole = "You are a helpful English tuto
                     { role: "system", content: systemRole },
                     { role: "user", content: prompt }
                 ],
-                temperature: 0.7
+                temperature: 0.7 // Sáng tạo vừa đủ
             })
         });
 
@@ -47,7 +46,26 @@ export async function askAI(prompt, systemRole = "You are a helpful English tuto
         }
 
         const data = await response.json();
-        return data.choices[0].message.content;
+        let content = data.choices[0].message.content;
+
+        // Auto-Clean JSON Logic
+        if (returnJson) {
+            try {
+                content = content.replace(/```json|```/g, '').trim();
+                const start = content.indexOf('{');
+                const end = content.lastIndexOf('}');
+                if (start !== -1 && end !== -1) {
+                    content = content.substring(start, end + 1);
+                }
+                return JSON.parse(content);
+            } catch (e) {
+                console.warn("AI JSON Parse Warning:", e);
+                // Fallback: trả về text gốc nếu parse lỗi để debug
+                throw new Error("AI không trả về đúng định dạng JSON.");
+            }
+        }
+
+        return content;
     } catch (error) {
         console.error("AI Error:", error);
         throw error;

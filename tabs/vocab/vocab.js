@@ -82,6 +82,7 @@ export default {
     },
 
     // PATCH_v2
+    // PATCH_v2
     async handleGenerate() {
         const topicName = document.getElementById('gen-topic').value;
         const qty = document.getElementById('gen-qty').value;
@@ -93,21 +94,29 @@ export default {
         document.getElementById('gen-loader').style.display = 'block';
         document.getElementById('btn-start-gen').disabled = true;
 
-        // PROMPT IMPROVED: Yêu cầu collocations và usage context
+        // 1. Lấy danh sách từ đã học để tránh trùng (Lấy 100 từ gần nhất)
+        const allVocab = Storage.get('vocab_list') || [];
+        const excludeList = allVocab.slice(-100).map(w => w.word).join(', ');
+
+        // 2. PROMPT NÂNG CẤP: Chống trùng + Mẹo nhớ
         const prompt = `
-            Act as an English Coach. Create a vocabulary list.
+            Act as a Creative English Coach. Create a vocabulary list.
             Topic: "${topicName}". Context: "${context}". Level: ${level}. Quantity: ${qty}.
+            
+            ⚠️ IMPORTANT: Do NOT include these words: [${excludeList}].
             
             Return valid JSON only (RFC8259):
             {
                 "title": "Topic Name in English",
+                "icon": "Emoji related to topic (e.g. 🍔)",
                 "words": [
                     {
                         "word": "word",
                         "ipa": "/ipa/",
                         "type": "n/v/adj",
                         "meaning": "Vietnamese meaning (short)",
-                        "collocation": "Common phrase/collocation using this word (e.g. 'make a decision')",
+                        "mnemonic": "Fun memory trick/tip in Vietnamese (Mẹo nhớ vui)",
+                        "collocation": "Common phrase using this word",
                         "example_en": "Natural example sentence",
                         "example_vi": "Vietnamese translation"
                     }
@@ -116,8 +125,8 @@ export default {
         `;
 
         try {
-            const raw = await askAI(prompt, "You are a Vocabulary JSON API.");
-            const data = JSON.parse(raw.replace(/```json|```/g, '').trim());
+            // Dùng hàm askAI mới với tham số returnJson = true
+            const data = await askAI(prompt, "You are a Smart Vocabulary JSON API.", true);
 
             data.id = Date.now();
             data.level = level;
@@ -195,9 +204,13 @@ export default {
         document.getElementById('fc-ipa').innerText = word.ipa || '';
         document.getElementById('fc-type').innerText = word.type || 'word';
         
+        // PATCH_v2
         // Back
         document.getElementById('fc-meaning').innerText = word.meaning;
+        // Hiển thị Mẹo nhớ (Nếu AI chưa sinh ra thì hiện placeholder)
+        document.getElementById('fc-mnemonic').innerText = word.mnemonic || 'Đang cập nhật mẹo nhớ...';
         document.getElementById('fc-collocation').innerText = word.collocation || '...';
+        
         document.getElementById('fc-en').innerText = `"${word.example_en}"`;
         document.getElementById('fc-vi').innerText = word.example_vi;
         

@@ -166,8 +166,15 @@
 .ctx-label { font-size: 0.75rem; color: #e0e7ff; margin-bottom: 4px; font-weight: 700; }
 .ctx-text { font-weight: 600; color: white; margin-bottom: 10px; }
 .divider { height:1px; background:rgba(255,255,255,0.2); margin:10px 0; }
-.ctx-example { font-style: italic; color: #f8fafc; margin-bottom: 4px; }
-.ctx-sub { font-size: 0.85rem; color: #c7d2fe; }
+// PATCH_v2
+.ctx-example { font-style: italic; color: #f8fafc; margin-bottom: 2px; }
+.ctx-sub { font-size: 0.85rem; color: #c7d2fe; font-style: italic; }
+.ctx-sub-text { font-weight: 500; color: #e0e7ff; margin-bottom: 8px; }
+
+.highlight-yellow { 
+    color: #fef08a; font-weight: 700; font-size: 1rem; 
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
 
 /* SRS Controls */
 .srs-controls { display: flex; gap: 15px; padding-bottom: 10px; justify-content: center; }
