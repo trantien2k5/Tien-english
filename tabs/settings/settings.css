@@ -214,17 +214,25 @@ body.no-scroll { overflow: hidden; height: 100vh; }
 
 .app-info { text-align: center; margin-top: 30px; color: #cbd5e1; font-size: 0.8rem; }
 
-/* --- SUB-VIEW (Lớp phủ toàn màn hình tab) --- */
+/* PATCH_v2: Fix Sub-view Position */
 .sub-view {
-    /* PATCH_v2: Fix overlay đè nav & vỡ layout PC */
     position: fixed; top: 0; bottom: 0;
-    left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: var(--container-max-width);
+    left: 0; width: 100%; 
     background: var(--color-bg); 
-    z-index: 900; /* Thấp hơn Bottom Nav (1000) */
+    z-index: 1100; /* Cao hơn nav mobile (1000) để che hết */
     display: none; flex-direction: column;
     animation: slideInRight 0.3s ease;
-    padding-bottom: 80px; /* Tránh bị che bởi nav */
+    padding-bottom: 0;
+}
+
+/* PC Override: Sub-view nằm gọn bên phải sidebar */
+@media (min-width: 768px) {
+    .sub-view {
+        left: 280px; /* Bắt đầu từ mép sidebar */
+        width: calc(100% - 280px); /* Chiếm phần còn lại */
+        z-index: 900; /* Thấp hơn hoặc bằng content */
+        max-width: none;
+    }
 }
 .sub-view.active { display: flex; }
 

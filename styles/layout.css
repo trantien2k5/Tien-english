@@ -51,36 +51,52 @@
 }
 
 /* --- RESPONSIVE DESKTOP --- */
+/* PATCH_v2: Fix Desktop Layout */
 @media (min-width: 768px) {
     body {
         padding-bottom: 0;
-        padding-left: 280px; /* Sidebar width */
+        padding-left: 280px; /* Chừa chỗ cho Sidebar */
+        background-color: #f1f5f9; /* Nền xám nhẹ cho PC pro hơn */
     }
 
     .bottom-nav {
         top: 0; left: 0; bottom: 0;
         width: 280px;
         height: 100vh;
+        transform: none; /* Reset transform center của mobile */
+        border-radius: 0; /* Bỏ bo góc mobile */
+        background: white;
         flex-direction: column;
         justify-content: flex-start;
         padding-top: 40px;
-        border-right: 1px solid var(--color-border);
+        border-right: 1px solid #e2e8f0;
         box-shadow: none;
-        gap: 20px;
+        gap: 10px;
+        z-index: 100;
     }
 
     .nav-item {
         flex-direction: row;
-        width: 80%;
-        padding: 12px 20px;
-        border-radius: var(--radius-md);
+        width: 90%;
+        padding: 14px 25px;
+        border-radius: 0 24px 24px 0; /* Bo góc phải */
         gap: 15px;
         font-size: 1rem;
         font-weight: 600;
+        margin: 0;
     }
 
-    .nav-item:hover { background-color: #f1f5f9; color: var(--color-primary); }
-    .nav-item.active { background-color: #eef2ff; color: var(--color-primary); }
+    .nav-item:hover { background-color: #f8fafc; color: var(--color-primary); }
+    .nav-item.active { 
+        background-color: #eef2ff; 
+        color: var(--color-primary);
+        border-right: 3px solid var(--color-primary);
+    }
     
-    .app-container { padding-top: 40px; }
+    .app-container { 
+        padding-top: 40px; 
+        max-width: 1000px; /* Giới hạn chiều rộng để nội dung không bị bè */
+        margin-left: auto;
+        margin-right: auto;
+    }
 }

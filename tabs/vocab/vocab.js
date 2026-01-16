@@ -42,21 +42,41 @@ export default {
     },
 
     // PATCH_v2
+    // PATCH_v2
     renderDashboard() {
         const grid = document.getElementById('topic-grid');
         if (!grid) return;
 
-        // 1. Update Stats
+        // 1. Get SRS Stats
         const totalTopics = this.topics.length;
-        const totalWords = this.topics.reduce((acc, t) => acc + (t.words ? t.words.length : 0), 0);
-        
-        const statTopics = document.getElementById('stat-topics');
-        const statWords = document.getElementById('stat-words');
-        
-        if(statTopics) statTopics.innerText = totalTopics;
-        if(statWords) statWords.innerText = totalWords;
+        const allWords = Storage.get('vocab_list'); // Lấy từ storage tổng
+        const dueWords = Storage.getDueWords();
+        const mastered = allWords.filter(w => w.status === 'mastered').length;
 
-        // 2. Render Grid
+        // Update UI Stats
+        if(document.getElementById('stat-topics')) document.getElementById('stat-topics').innerText = totalTopics;
+        if(document.getElementById('stat-words')) document.getElementById('stat-words').innerText = allWords.length;
+        if(document.getElementById('stat-mastered')) document.getElementById('stat-mastered').innerText = mastered;
+
+        // 2. Insert Review Action (Dynamic)
+        const actionArea = document.querySelector('.vocab-action-area');
+        // Xóa nút review cũ nếu có để tránh duplicate
+        const oldReview = document.getElementById('btn-start-review');
+        if(oldReview) oldReview.remove();
+
+        if (dueWords.length > 0 && actionArea) {
+            const reviewBtn = document.createElement('button');
+            reviewBtn.id = 'btn-start-review';
+            reviewBtn.className = 'btn-create-glow'; // Tái sử dụng class đẹp
+            reviewBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)'; // Màu cam
+            reviewBtn.style.marginTop = '15px';
+            reviewBtn.innerHTML = `<span class="sparkle">🧠</span> Ôn tập ngay (${dueWords.length} từ)`;
+            reviewBtn.onclick = () => this.startReviewSession();
+            
+            actionArea.appendChild(reviewBtn);
+        }
+
+        // 3. Render Grid
         if (totalTopics === 0) {
             grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding: 40px 20px;">
                 <div style="font-size:3rem; margin-bottom:10px">📦</div>
@@ -241,37 +261,60 @@ export default {
     },
 
     // PATCH_v2
+    // PATCH_v2
     handleRating(type) {
         const card = document.getElementById('active-card');
         const direction = type === 'remember' ? 'translateX(50px)' : 'translateX(-50px)';
         
-        // 1. Swipe Animation (Giữ nguyên góc xoay hiện tại)
-        // BUG FIX: Dùng transform rỗng khi reset để không ghi đè class CSS
+        // 1. SAVE SRS PROGRESS
+        const currentWord = this.playerState.words[this.playerState.index];
+        if (currentWord) {
+            Storage.updateVocabSRS(currentWord.word, type);
+        }
+
+        // 2. Animation
         card.style.transform = `${direction} rotateY(${this.playerState.isFlipped ? 180 : 0}deg)`;
         card.style.opacity = '0.5';
 
         setTimeout(() => {
             if (this.playerState.index < this.playerState.words.length - 1) {
                 this.playerState.index++;
-                
-                // 2. Reset Style (Quan trọng: set thành '' để xóa inline-style)
                 card.style.transition = 'none';
                 card.style.transform = ''; 
                 card.style.opacity = '1';
-                
-                // Force Reflow
                 void card.offsetWidth; 
                 card.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                
                 this.renderCard();
             } else {
-                alert("Chúc mừng! Bạn đã hoàn thành bộ từ này. 🎉");
+                // 3. FINISH & SYNC DAILY PLAN
+                const tasks = JSON.parse(localStorage.getItem('daily_tasks')) || {};
+                if (!tasks.vocab) {
+                    tasks.vocab = true;
+                    localStorage.setItem('daily_tasks', JSON.stringify(tasks));
+                }
+
+                alert("🎉 Hoàn thành bài học! Dữ liệu trí nhớ đã được cập nhật.");
                 this.switchView('dashboard');
-                // Reset cho lần sau mở lại
+                this.renderDashboard(); // Re-render để update stats
+                
                 card.style.transform = '';
                 card.style.opacity = '1';
             }
         }, 300);
+    },
+
+    // Chức năng ôn tập từ đến hạn
+    startReviewSession() {
+        const dueWords = Storage.getDueWords();
+        if (dueWords.length === 0) return alert("Bạn đã ôn hết từ hôm nay rồi! 👏");
+        
+        // Shuffle (Trộn ngẫu nhiên)
+        const sessionWords = dueWords.sort(() => 0.5 - Math.random()).slice(0, 20); // Max 20 từ/lần
+        
+        this.startPlayer({
+            title: "Review Session 🧠",
+            words: sessionWords
+        });
     },
 
     playAudio() {

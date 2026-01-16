@@ -220,10 +220,52 @@ export const Storage = {
         localStorage.setItem(this.HISTORY_KEY, JSON.stringify(list));
     },
 
+    // PATCH_v2
     deleteHistoryItem(id) {
         let list = this.getHistory();
         list = list.filter(item => item.id !== id);
         localStorage.setItem(this.HISTORY_KEY, JSON.stringify(list));
+    },
+
+    /**
+     * ✅ SRS ALGORITHM (Simplified SM-2)
+     * Tính toán ngày ôn tiếp theo dựa trên rating
+     */
+    getDueWords() {
+        const list = this.get('vocab_list');
+        const now = Date.now();
+        // Lấy các từ có dueDate <= hiện tại HOẶC từ mới (status = new)
+        return list.filter(w => !w.dueDate || w.dueDate <= now || w.status === 'new');
+    },
+
+    updateVocabSRS(wordText, rating) {
+        // rating: 'remember' (Good) | 'forget' (Again)
+        const list = this.get('vocab_list');
+        const index = list.findIndex(w => w.word === wordText);
+        
+        if (index > -1) {
+            const word = list[index];
+            const ONE_DAY = 24 * 60 * 60 * 1000;
+
+            if (rating === 'forget') {
+                // Quên -> Reset về 0, ôn lại ngay ngày mai
+                word.interval = 0;
+                word.status = 'learning';
+                word.dueDate = Date.now() + ONE_DAY;
+            } else {
+                // Nhớ -> Tăng khoảng cách ôn (Exponential)
+                if (word.interval === 0) word.interval = 1;
+                else if (word.interval === 1) word.interval = 3;
+                else word.interval = Math.ceil(word.interval * 2.2); // Hệ số 2.2
+                
+                word.status = word.interval > 20 ? 'mastered' : 'review';
+                word.dueDate = Date.now() + (word.interval * ONE_DAY);
+            }
+            
+            word.lastSeen = Date.now();
+            list[index] = word;
+            this.set('vocab_list', list);
+        }
     }
 
 };
