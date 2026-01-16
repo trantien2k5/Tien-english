@@ -1,0 +1,9 @@
+{
+  "d1_databases": [
+    {
+      "binding": "wordstock_db",
+      "database_name": "wordstock-db",
+      "database_id": "ae2f8c04-c3cd-4904-b6a6-99fe02bd3db5"
+    }
+  ]
+}

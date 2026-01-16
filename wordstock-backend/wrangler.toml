@@ -1,0 +1,16 @@
+name = "wordstock-auth"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "wordstock-db"
+database_id = {
+  "d1_databases": [
+    {
+      "binding": "wordstock_db",
+      "database_name": "wordstock-db",
+      "database_id": "ae2f8c04-c3cd-4904-b6a6-99fe02bd3db5"
+    }
+  ]
+}
