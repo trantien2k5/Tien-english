@@ -66,32 +66,34 @@ export default {
         window.openTopic = (idx) => this.startPlayer(this.topics[idx]);
     },
 
+    // PATCH_v2
     async handleGenerate() {
         const topicName = document.getElementById('gen-topic').value;
         const qty = document.getElementById('gen-qty').value;
         const level = document.getElementById('gen-level').value;
-        const context = document.getElementById('gen-context').value || "General communication";
+        const context = document.getElementById('gen-context').value || "Daily conversation";
 
         if (!topicName) return alert("Vui lòng nhập tên chủ đề!");
 
-        // UI Loading
         document.getElementById('gen-loader').style.display = 'block';
         document.getElementById('btn-start-gen').disabled = true;
 
+        // PROMPT IMPROVED: Yêu cầu collocations và usage context
         const prompt = `
-            Act as an English Teacher. Create a vocabulary list.
+            Act as an English Coach. Create a vocabulary list.
             Topic: "${topicName}". Context: "${context}". Level: ${level}. Quantity: ${qty}.
             
-            Return valid JSON only:
+            Return valid JSON only (RFC8259):
             {
-                "title": "English Topic Name",
+                "title": "Topic Name in English",
                 "words": [
                     {
                         "word": "word",
                         "ipa": "/ipa/",
                         "type": "n/v/adj",
-                        "meaning": "Vietnamese meaning",
-                        "example_en": "Example sentence related to context",
+                        "meaning": "Vietnamese meaning (short)",
+                        "collocation": "Common phrase/collocation using this word (e.g. 'make a decision')",
+                        "example_en": "Natural example sentence",
                         "example_vi": "Vietnamese translation"
                     }
                 ]
@@ -99,19 +101,16 @@ export default {
         `;
 
         try {
-            const raw = await askAI(prompt, "You are a JSON Vocab Generator.");
+            const raw = await askAI(prompt, "You are a Vocabulary JSON API.");
             const data = JSON.parse(raw.replace(/```json|```/g, '').trim());
 
-            // Add meta data
             data.id = Date.now();
             data.level = level;
             data.createdAt = new Date().toLocaleDateString();
 
-            // Save & Redirect
             this.topics.unshift(data);
             this.saveTopics();
             this.switchView('dashboard');
-            alert(`Đã tạo chủ đề "${data.title}" thành công! 🎉`);
 
         } catch (err) {
             console.error(err);
@@ -122,14 +121,12 @@ export default {
         }
     },
 
-    // PATCH_v2: Logic Core & AI Generator (Giữ nguyên phần trên)
-
-    // --- PLAYER LOGIC ---
+    // --- PLAYER LOGIC (UPDATED SRS) ---
     playerState: {
         words: [],
         index: 0,
         isFlipped: false,
-        autoPlay: true
+        autoPlay: false // Mặc định tắt để user tự học
     },
 
     startPlayer(topicData) {
@@ -137,25 +134,40 @@ export default {
         this.playerState.index = 0;
         this.playerState.isFlipped = false;
         
-        document.getElementById('player-title').innerText = topicData.title;
+        // document.getElementById('player-title').innerText = topicData.title; // Đã xóa trong HTML mới
         this.switchView('player');
         this.renderCard();
 
-        // Bind Player Controls
+        // Bind Events Mới
         document.getElementById('btn-exit-player').onclick = () => {
             window.speechSynthesis.cancel();
             this.switchView('dashboard');
         };
-        
-        document.getElementById('active-card').onclick = () => this.flipCard();
-        document.getElementById('btn-next-card').onclick = () => this.nextCard();
-        document.getElementById('btn-prev-card').onclick = () => this.prevCard();
+
+        // Flip Card
+        const card = document.getElementById('active-card');
+        card.onclick = (e) => {
+            // Chặn click nếu bấm vào nút loa
+            if(e.target.closest('button')) return; 
+            this.flipCard();
+        };
+
+        // Audio Buttons
+        document.getElementById('btn-speak-front').onclick = (e) => { e.stopPropagation(); this.playAudio(); };
+        document.getElementById('btn-speak-back').onclick = (e) => { e.stopPropagation(); this.playAudio(); };
+
+        // SRS Buttons
+        document.getElementById('btn-forget').onclick = () => this.handleRating('forget');
+        document.getElementById('btn-remember').onclick = () => this.handleRating('remember');
         
         const btnAuto = document.getElementById('btn-auto-play');
         btnAuto.onclick = () => {
             this.playerState.autoPlay = !this.playerState.autoPlay;
             btnAuto.classList.toggle('active', this.playerState.autoPlay);
-            if(this.playerState.autoPlay) this.playAudio();
+            if(this.playerState.autoPlay && !this.playerState.isFlipped) {
+                this.playAudio();
+                setTimeout(() => this.flipCard(), 2000);
+            }
         };
     },
 
@@ -163,25 +175,34 @@ export default {
         const { words, index } = this.playerState;
         const word = words[index];
         
-        // Update Content
+        // Front
         document.getElementById('fc-word').innerText = word.word;
-        document.getElementById('fc-ipa').innerText = word.ipa;
-        document.getElementById('fc-type').innerText = word.type;
+        document.getElementById('fc-ipa').innerText = word.ipa || '';
+        document.getElementById('fc-type').innerText = word.type || 'word';
         
+        // Back
         document.getElementById('fc-meaning').innerText = word.meaning;
+        document.getElementById('fc-collocation').innerText = word.collocation || '...';
         document.getElementById('fc-en').innerText = `"${word.example_en}"`;
         document.getElementById('fc-vi').innerText = word.example_vi;
         
+        // Progress
+        const pct = ((index) / words.length) * 100;
+        document.getElementById('player-bar').style.width = `${pct}%`;
         document.getElementById('player-progress').innerText = `${index + 1}/${words.length}`;
 
-        // Reset Flip State
+        // Reset state
         const card = document.getElementById('active-card');
         card.classList.remove('is-flipped');
         this.playerState.isFlipped = false;
 
-        // Auto Audio
+        // Auto Play Logic
         if (this.playerState.autoPlay) {
-            setTimeout(() => this.playAudio(), 500);
+            this.playAudio();
+            // Tự động lật sau 2s
+            setTimeout(() => {
+                if(!this.playerState.isFlipped) this.flipCard();
+            }, 2500);
         }
     },
 
@@ -191,20 +212,38 @@ export default {
         card.classList.toggle('is-flipped', this.playerState.isFlipped);
     },
 
-    nextCard() {
-        if (this.playerState.index < this.playerState.words.length - 1) {
-            this.playerState.index++;
-            this.renderCard();
-        } else {
-            alert("Đã hết thẻ! 🎉");
-        }
-    },
+    // PATCH_v2
+    handleRating(type) {
+        const card = document.getElementById('active-card');
+        const direction = type === 'remember' ? 'translateX(50px)' : 'translateX(-50px)';
+        
+        // 1. Swipe Animation (Giữ nguyên góc xoay hiện tại)
+        // BUG FIX: Dùng transform rỗng khi reset để không ghi đè class CSS
+        card.style.transform = `${direction} rotateY(${this.playerState.isFlipped ? 180 : 0}deg)`;
+        card.style.opacity = '0.5';
 
-    prevCard() {
-        if (this.playerState.index > 0) {
-            this.playerState.index--;
-            this.renderCard();
-        }
+        setTimeout(() => {
+            if (this.playerState.index < this.playerState.words.length - 1) {
+                this.playerState.index++;
+                
+                // 2. Reset Style (Quan trọng: set thành '' để xóa inline-style)
+                card.style.transition = 'none';
+                card.style.transform = ''; 
+                card.style.opacity = '1';
+                
+                // Force Reflow
+                void card.offsetWidth; 
+                card.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                
+                this.renderCard();
+            } else {
+                alert("Chúc mừng! Bạn đã hoàn thành bộ từ này. 🎉");
+                this.switchView('dashboard');
+                // Reset cho lần sau mở lại
+                card.style.transform = '';
+                card.style.opacity = '1';
+            }
+        }, 300);
     },
 
     playAudio() {
