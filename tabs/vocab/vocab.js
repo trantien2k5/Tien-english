@@ -118,26 +118,30 @@ export default {
         const allVocab = Storage.get('vocab_list') || [];
         const excludeList = allVocab.slice(-100).map(w => w.word).join(', ');
 
-        // 2. PROMPT NÂNG CẤP: Chống trùng + Mẹo nhớ
+        // PATCH_v2
+        // 2. PROMPT "LEXICAL APPROACH": Học theo cụm từ (Phrases/Collocations)
         const prompt = `
-            Act as a Creative English Coach. Create a vocabulary list.
+            Act as an Expert English Coach focusing on **Lexical Approach**.
             Topic: "${topicName}". Context: "${context}". Level: ${level}. Quantity: ${qty}.
-            
-            ⚠️ IMPORTANT: Do NOT include these words: [${excludeList}].
-            
+
+            ⚠️ CRITICAL INSTRUCTION:
+            - Do NOT generate single isolated words (e.g. "Decision").
+            - **MUST generate Collocations, Phrasal Verbs, or Common Phrases** (e.g. "Make a decision", "Run out of time", "Take responsibility").
+            - Ignore words in this list: [${excludeList}].
+
             Return valid JSON only (RFC8259):
             {
-                "title": "Topic Name in English",
-                "icon": "Emoji related to topic (e.g. 🍔)",
+                "title": "Topic Name (Phrases)",
+                "icon": "Emoji related to topic (e.g. 💬)",
                 "words": [
                     {
-                        "word": "word",
-                        "ipa": "/ipa/",
-                        "type": "n/v/adj",
-                        "meaning": "Vietnamese meaning (short)",
-                        "mnemonic": "Fun memory trick/tip in Vietnamese (Mẹo nhớ vui)",
-                        "collocation": "Common phrase using this word",
-                        "example_en": "Natural example sentence",
+                        "word": "English Phrase (e.g. 'Make a decision')",
+                        "ipa": "/ipa of phrase/",
+                        "type": "phrase",
+                        "meaning": "Vietnamese meaning (natural)",
+                        "mnemonic": "A short, funny tip or story to remember this phrase in Vietnamese",
+                        "collocation": "Real-life situation/context to use this",
+                        "example_en": "A natural sentence using this phrase",
                         "example_vi": "Vietnamese translation"
                     }
                 ]
@@ -215,39 +219,57 @@ export default {
         };
     },
 
+    // PATCH_v3: Fix Crash Null ID
     renderCard() {
         const { words, index } = this.playerState;
+        if (!words || words.length === 0) return;
         const word = words[index];
         
+        // Helper: Gán text an toàn (tránh crash nếu sai HTML)
+        const setText = (id, text) => {
+            const el = document.getElementById(id);
+            if(el) el.innerText = text || '';
+        };
+
         // Front
-        document.getElementById('fc-word').innerText = word.word;
-        document.getElementById('fc-ipa').innerText = word.ipa || '';
-        document.getElementById('fc-type').innerText = word.type || 'word';
+        setText('fc-word', word.word);
+        setText('fc-ipa', word.ipa);
+        setText('fc-type', word.type || 'word');
         
-        // PATCH_v2
         // Back
-        document.getElementById('fc-meaning').innerText = word.meaning;
-        // Hiển thị Mẹo nhớ (Nếu AI chưa sinh ra thì hiện placeholder)
-        document.getElementById('fc-mnemonic').innerText = word.mnemonic || 'Đang cập nhật mẹo nhớ...';
-        document.getElementById('fc-collocation').innerText = word.collocation || '...';
+        setText('fc-meaning', word.meaning);
         
-        document.getElementById('fc-en').innerText = `"${word.example_en}"`;
-        document.getElementById('fc-vi').innerText = word.example_vi;
+        // Mẹo nhớ (Check kỹ container)
+        const mnContainer = document.getElementById('mnemonic-container');
+        if (mnContainer) {
+            if (word.mnemonic && word.mnemonic.trim() !== '') {
+                setText('fc-mnemonic', word.mnemonic);
+                mnContainer.style.display = 'block';
+            } else {
+                mnContainer.style.display = 'none';
+            }
+        }
+        
+        setText('fc-collocation', word.collocation || '...');
+        setText('fc-en', word.example_en ? `"${word.example_en}"` : '');
+        setText('fc-vi', word.example_vi);
         
         // Progress
         const pct = ((index) / words.length) * 100;
-        document.getElementById('player-bar').style.width = `${pct}%`;
-        document.getElementById('player-progress').innerText = `${index + 1}/${words.length}`;
+        const bar = document.getElementById('player-bar');
+        if(bar) bar.style.width = `${pct}%`;
+        setText('player-progress', `${index + 1}/${words.length}`);
 
-        // Reset state
+        // Reset Flip
         const card = document.getElementById('active-card');
-        card.classList.remove('is-flipped');
-        this.playerState.isFlipped = false;
+        if (card) {
+            card.classList.remove('is-flipped');
+            this.playerState.isFlipped = false;
+        }
 
-        // Auto Play Logic
+        // Auto Play
         if (this.playerState.autoPlay) {
             this.playAudio();
-            // Tự động lật sau 2s
             setTimeout(() => {
                 if(!this.playerState.isFlipped) this.flipCard();
             }, 2500);
