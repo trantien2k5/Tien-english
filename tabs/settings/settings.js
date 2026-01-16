@@ -212,11 +212,25 @@ export default {
         
         // PATCH_v2: Handle Save Button
         document.getElementById('btn-save-profile')?.addEventListener('click', () => {
-            // Đóng popup
             document.getElementById('item-profile').classList.remove('active');
             document.getElementById('setting-overlay').classList.remove('active');
-            // Feedback
             alert(`Đã cập nhật hồ sơ: ${this.settings.username} (${this.settings.level}) ✅`);
+        });
+
+        // PATCH_v5: Handle Logout
+        document.getElementById('btn-logout')?.addEventListener('click', () => {
+            if (confirm("Bạn có chắc muốn đăng xuất?")) {
+                // 1. Xóa dữ liệu phiên đăng nhập
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_info');
+                
+                // 2. Reset tên về mặc định (Optional)
+                this.save('username', 'Student');
+                
+                // 3. Reload để áp dụng
+                alert("Đã đăng xuất thành công! 👋");
+                location.reload();
+            }
         });
 
         this.els.inpDailySlider?.addEventListener('input', (e) => {
@@ -288,16 +302,34 @@ export default {
             }
         });
         
-        // Edit Profile Button (Header)
+        // PATCH_v2: Nút Login/Profile Logic
         const btnEdit = document.getElementById('btn-edit-profile');
-        if(btnEdit) btnEdit.addEventListener('click', () => {
-            const itemProfile = document.getElementById('item-profile');
-            if(itemProfile) {
-                // Mở accordion profile và scroll tới đó
-                itemProfile.classList.add('active');
-                itemProfile.scrollIntoView({behavior: 'smooth'});
-            }
-        });
+        const profileCard = document.querySelector('.profile-card');
+        const token = localStorage.getItem('auth_token');
+
+        // Logic click vào thẻ Profile
+        if (profileCard) {
+            profileCard.style.cursor = 'pointer';
+            profileCard.addEventListener('click', () => {
+                if (!token) {
+                    // Chưa đăng nhập -> Mở trang Auth
+                    loadTab('auth');
+                } else {
+                    // Đã đăng nhập -> Mở accordion profile
+                    const itemProfile = document.getElementById('item-profile');
+                    if(itemProfile) {
+                        itemProfile.classList.add('active');
+                        itemProfile.scrollIntoView({behavior: 'smooth'});
+                    }
+                }
+            });
+        }
+
+        // Cập nhật UI nếu chưa đăng nhập
+        if (!token && document.getElementById('disp-name')) {
+            document.getElementById('disp-name').innerText = "Khách (Chạm để Login)";
+            document.querySelector('.pc-badges').style.display = 'none';
+        }
     },
 
     handleExport() {

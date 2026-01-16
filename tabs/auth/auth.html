@@ -1,0 +1,39 @@
+<div class="auth-container fade-in">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2 id="auth-title">Chào mừng trở lại! 👋</h2>
+            <p id="auth-desc">Đăng nhập để đồng bộ dữ liệu học tập</p>
+        </div>
+
+        <form id="form-login" class="auth-form">
+            <div class="input-group">
+                <input type="email" id="l-email" class="form-input" placeholder="Email" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="l-pass" class="form-input" placeholder="Mật khẩu" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn-block">Đăng Nhập</button>
+            <p class="auth-switch">
+                Chưa có tài khoản? <span onclick="window.switchAuth('register')">Đăng ký ngay</span>
+            </p>
+        </form>
+
+        <form id="form-register" class="auth-form" style="display:none">
+            <div class="input-group">
+                <input type="text" id="r-name" class="form-input" placeholder="Tên hiển thị" required>
+            </div>
+            <div class="input-group">
+                <input type="email" id="r-email" class="form-input" placeholder="Email" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="r-pass" class="form-input" placeholder="Mật khẩu" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn-block">Đăng Ký</button>
+            <p class="auth-switch">
+                Đã có tài khoản? <span onclick="window.switchAuth('login')">Đăng nhập</span>
+            </p>
+        </form>
+
+        <div id="auth-msg" class="text-danger" style="margin-top:10px; text-align:center"></div>
+    </div>
+</div>

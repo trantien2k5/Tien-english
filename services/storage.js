@@ -3,15 +3,74 @@
  * Quản lý lưu trữ local & Logic chống trùng lặp
  */
 
+// PATCH_v6: Cloud Sync Core
 export const Storage = {
-    // Helper đọc/ghi nhanh
+    // PATCH_DEPLOY: Dùng link thật trên Cloudflare
+    API_URL: 'https://wordstock-auth.trantien.workers.dev',
+
+    // Helper đọc (Ưu tiên Local cho nhanh)
     get(key, defaultValue = []) {
         const data = localStorage.getItem(key);
         return data ? JSON.parse(data) : defaultValue;
     },
 
+    // Helper ghi (Lưu Local + Đẩy lên Cloud)
     set(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
+        this.syncToCloud(key, value); // Background sync
+    },
+
+    // ☁️ Logic đẩy lên Cloud
+    async syncToCloud(key, value) {
+        const token = localStorage.getItem('auth_token');
+        if (!token) return; // Chưa đăng nhập thì thôi
+
+        try {
+            await fetch(`${this.API_URL}/sync`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ key, data: value })
+            });
+            console.log(`☁️ Synced [${key}] to cloud.`);
+        } catch (e) {
+            console.warn(`Sync failed for [${key}]:`, e);
+        }
+    },
+
+    // ☁️ Logic kéo từ Cloud về (Dùng khi mới Login)
+    async pullFromCloud(key) {
+        const token = localStorage.getItem('auth_token');
+        if (!token) return;
+
+        try {
+            const res = await fetch(`${this.API_URL}/sync/${key}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const json = await res.json();
+            
+            if (json.data) {
+                localStorage.setItem(key, JSON.stringify(json.data));
+                console.log(`⬇️ Pulled [${key}] from cloud.`);
+                return json.data;
+            }
+        } catch (e) {
+            console.error(`Pull failed for [${key}]:`, e);
+        }
+    },
+
+    // Hàm gọi khi vừa Đăng nhập xong để đồng bộ toàn bộ
+    async syncAll() {
+        console.log("🔄 Syncing all data...");
+        await this.pullFromCloud('vocab_list');
+        await this.pullFromCloud('listening_history');
+        await this.pullFromCloud('wordstock_settings_v1');
+        await this.pullFromCloud('user_stats'); // PATCH_v7: Sync thêm Stats
+        
+        console.log("✅ Sync complete!");
+        location.reload();
     },
 
     /**
@@ -266,6 +325,27 @@ export const Storage = {
             list[index] = word;
             this.set('vocab_list', list);
         }
+    },
+
+    // PATCH_v7: Quản lý Stats & Streak (Cloud Sync)
+    getGameStats() {
+        const defaultStats = {
+            exp: 0,
+            streak: 0,
+            lastLogin: '',
+            level: 'A1',
+            dailyMinutes: 0,
+            dailyTasks: { vocab: false, listening: false, speaking: false },
+            dailyPlanDate: ''
+        };
+        return this.get('user_stats', defaultStats);
+    },
+
+    saveGameStats(newStats) {
+        const current = this.getGameStats();
+        // Merge dữ liệu cũ và mới
+        const final = { ...current, ...newStats };
+        this.set('user_stats', final);
     }
 
 };

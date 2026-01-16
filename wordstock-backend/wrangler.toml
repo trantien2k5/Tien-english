@@ -1,16 +1,10 @@
 name = "wordstock-auth"
 main = "src/index.js"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-09-23"
+# PATCH: Bật chế độ tương thích Node.js để dùng thư viện mã hóa
+compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
 binding = "DB"
 database_name = "wordstock-db"
-database_id = {
-  "d1_databases": [
-    {
-      "binding": "wordstock_db",
-      "database_name": "wordstock-db",
-      "database_id": "ae2f8c04-c3cd-4904-b6a6-99fe02bd3db5"
-    }
-  ]
-}
+database_id = "ae2f8c04-c3cd-4904-b6a6-99fe02bd3db5"

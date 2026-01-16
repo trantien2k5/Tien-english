@@ -16,20 +16,24 @@ export default {
         if(title) title.innerText = `Xin chào, ${settings.username || 'Student'}! 👋`;
     },
 
-    // --- 1. LOGIC DAILY PLAN ---
+    // --- 1. LOGIC DAILY PLAN (Cloud Synced) ---
     checkNewDay() {
         const today = new Date().toDateString();
-        const lastPlanDate = localStorage.getItem('daily_plan_date');
+        const stats = Storage.getGameStats();
         
-        if (lastPlanDate !== today) {
-            const initialTasks = { vocab: false, listening: false, speaking: false };
-            localStorage.setItem('daily_tasks', JSON.stringify(initialTasks));
-            localStorage.setItem('daily_plan_date', today);
+        if (stats.dailyPlanDate !== today) {
+            // Reset task ngày mới
+            Storage.saveGameStats({
+                dailyTasks: { vocab: false, listening: false, speaking: false },
+                dailyMinutes: 0,
+                dailyPlanDate: today
+            });
         }
     },
 
     renderDailyPlan() {
-        const tasks = JSON.parse(localStorage.getItem('daily_tasks')) || { vocab: false, listening: false, speaking: false };
+        const stats = Storage.getGameStats();
+        const tasks = stats.dailyTasks || { vocab: false, listening: false, speaking: false };
         let completedCount = 0;
 
         this.updateTaskUI('vocab', tasks.vocab);
@@ -77,41 +81,41 @@ export default {
         // Lưu ý: Trạng thái 'done' sẽ do các tab con tự cập nhật vào localStorage
     },
 
-    // --- 2. LOGIC STATS (STREAK, TIME) ---
+    // --- 2. LOGIC STATS (Cloud Synced) ---
     renderStats() {
-        // Xử lý Streak
         const today = new Date().toDateString();
-        const lastLogin = localStorage.getItem('last_login_date');
-        let streak = parseInt(localStorage.getItem('user_streak') || '0');
+        const stats = Storage.getGameStats();
+        let { streak, lastLogin, dailyMinutes } = stats;
 
+        // Tính Streak
         if (lastLogin !== today) {
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
+            
+            // Nếu đăng nhập hôm qua -> Tăng streak. Nếu không -> Reset 1
             if (lastLogin === yesterday.toDateString()) {
                 streak++;
-            } else {
-                streak = 1;
+            } else if (lastLogin !== today) {
+                streak = 1; 
             }
-            localStorage.setItem('last_login_date', today);
-            localStorage.setItem('user_streak', streak);
+            // Save ngay để đồng bộ
+            Storage.saveGameStats({ streak, lastLogin: today });
         }
         
-        // Xử lý Time (Giả lập tăng thời gian mỗi lần vào Home)
-        let dailyMins = parseInt(localStorage.getItem('daily_minutes') || '0');
-        // Cộng thêm 2 phút mỗi lần load trang Home (Demo)
-        dailyMins += 2; 
-        localStorage.setItem('daily_minutes', dailyMins);
+        // Tính Time (Demo: +2 phút mỗi lần vào Home)
+        dailyMinutes = (dailyMinutes || 0) + 2;
+        Storage.saveGameStats({ dailyMinutes });
 
-        // Hiển thị lên giao diện
+        // Render UI
         const streakEl = document.getElementById('user-streak');
         const timeEl = document.getElementById('study-time');
         const wordsEl = document.getElementById('weekly-words');
 
         if(streakEl) streakEl.innerText = streak;
-        if(timeEl) timeEl.innerText = `${dailyMins}p`;
+        if(timeEl) timeEl.innerText = `${dailyMinutes}p`;
         
-        // Lấy số từ vựng thật
-        const vocabList = JSON.parse(localStorage.getItem('vocab_list') || '[]');
+        // Số từ vựng
+        const vocabList = Storage.get('vocab_list');
         if(wordsEl) wordsEl.innerText = vocabList.length;
     }
 };

@@ -7,3 +7,13 @@ CREATE TABLE users (
   name TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Bảng lưu trữ dữ liệu đồng bộ (Key-Value Store)
+DROP TABLE IF EXISTS user_data;
+CREATE TABLE user_data (
+  user_id INTEGER,
+  key TEXT,       -- Ví dụ: 'vocab_list', 'settings'
+  value TEXT,     -- Dữ liệu JSON
+  updated_at INTEGER,
+  PRIMARY KEY (user_id, key)
+);

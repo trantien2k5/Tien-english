@@ -5,7 +5,9 @@
 
 const APP_CONTAINER = document.getElementById('app');
 
-// PATCH_v3: Fix Audio Leak + SPA Core
+// PATCH_v4: Expose loadTab globally (Fix ReferenceError)
+window.loadTab = loadTab;
+
 async function loadTab(tabName) {
     // 0. STOP AUDIO TOÀN HỆ THỐNG (Quan trọng)
     window.speechSynthesis.cancel(); 
