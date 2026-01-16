@@ -1,46 +1,69 @@
-/* --- SETTINGS PAGE STYLES (Clean) --- */
-.settings-header-pro { margin-bottom: 25px; }
-.sh-top h2 { font-size: 1.8rem; margin: 0; color: var(--color-primary); }
-.sh-top p { color: var(--color-text-muted); font-size: 0.95rem; }
-/* (Phần còn lại giữ nguyên như bản Pro trước đó) */
-.sh-top p { color: var(--color-text-muted); font-size: 0.95rem; }
+/* PATCH_v3: UI Revamp (Modern & Clean) */
+.settings-header-pro { margin-bottom: 35px; padding: 0 5px; }
+.sh-top h2 { 
+    font-size: 2.2rem; margin: 0 0 5px 0; 
+    color: #1e293b; letter-spacing: -1px; font-weight: 800; 
+}
+.sh-top p { color: #94a3b8; font-size: 1rem; font-weight: 500; }
 
+/* Profile Card - Glassy & Soft */
 .profile-card {
-    background: white; border-radius: 16px; padding: 15px;
-    display: flex; align-items: center; gap: 15px; margin-top: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;
+    background: #ffffff;
+    border-radius: 24px; padding: 20px;
+    display: flex; align-items: center; gap: 20px; margin-top: 25px;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.06); 
+    border: 1px solid #f8fafc;
     position: relative;
+    transition: transform 0.2s;
 }
-.pc-avatar {
-    width: 50px; height: 50px; background: #eef2ff; border-radius: 50%;
-    display: flex; justify-content: center; align-items: center; font-size: 1.8rem;
-}
-.pc-info h3 { margin: 0 0 5px 0; font-size: 1.1rem; color: #1e293b; }
-.pc-badges { display: flex; gap: 8px; }
-.badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; font-weight: 700; }
-.badge-level { background: #e0e7ff; color: #4338ca; }
-.badge-streak { background: #ffedd5; color: #c2410c; }
-.btn-edit-profile {
-    position: absolute; right: 15px; top: 15px; background: none; border: none; cursor: pointer; opacity: 0.5;
-}
+.profile-card:hover { transform: translateY(-2px); }
 
-/* PATCH_v2: Chuẩn hóa Design System Chips */
+.pc-avatar {
+    width: 64px; height: 64px; 
+    background: linear-gradient(135deg, #e0e7ff, #eff6ff); 
+    color: var(--color-primary);
+    border-radius: 20px;
+    display: flex; justify-content: center; align-items: center; font-size: 2rem;
+    box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.2);
+}
+.pc-info h3 { 
+    margin: 0 0 8px 0; font-size: 1.25rem; font-weight: 800; color: #0f172a; 
+}
+.pc-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge { 
+    font-size: 0.75rem; padding: 4px 10px; border-radius: 8px; 
+    font-weight: 700; letter-spacing: 0.3px; 
+}
+.badge-level { background: #eef2ff; color: var(--color-primary); border: 1px solid #e0e7ff; }
+.badge-streak { background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; }
+.btn-edit-profile {
+    position: absolute; right: 20px; top: 20px; 
+    background: #f8fafc; border-radius: 50%; width: 32px; height: 32px;
+    border: none; cursor: pointer; color: #94a3b8;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
+}
+.btn-edit-profile:hover { background: #e2e8f0; color: var(--color-primary); }
+
+/* Modern Chips */
 .s-chip {
-    font-size: 0.75rem; padding: 6px 12px; border-radius: 20px;
-    background: #f1f5f9; color: #64748b; font-weight: 700;
-    min-width: 60px; text-align: center;
+    font-size: 0.8rem; padding: 6px 14px; border-radius: 12px;
+    background: #f1f5f9; color: #64748b; font-weight: 600;
+    min-width: unset; /* Tự co giãn */
     display: inline-flex; justify-content: center; align-items: center;
 }
-.s-chip.blue { background: #dbeafe; color: #1e40af; }
-.s-chip.purple { background: #f3e8ff; color: #7e22ce; }
-.s-chip.green { background: #dcfce7; color: #15803d; }
+.s-chip.blue { background: #eff6ff; color: #2563eb; }
+.s-chip.purple { background: #f3e8ff; color: #9333ea; }
+.s-chip.green { background: #ecfdf5; color: #16a34a; }
 
+/* Grouped List Style (iOS like) */
 .setting-row {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 15px; background: white; border-bottom: 1px solid #f1f5f9;
+    padding: 16px 20px; /* Thoáng hơn */
+    background: white; border-bottom: 1px solid #f1f5f9;
 }
-.setting-row:first-child { border-radius: 12px 12px 0 0; }
-.setting-row:last-child { border-radius: 0 0 12px 12px; border-bottom: none; }
+.setting-row:first-child { border-radius: 16px 16px 0 0; }
+.setting-row:last-child { border-radius: 0 0 16px 16px; border-bottom: none; }
 
 /* --- SWITCH TOGGLE --- */
 .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
@@ -123,30 +146,28 @@ input:checked + .slider-round:before { transform: translateX(20px); }
     text-align: center; color: #94a3b8; font-size: 0.9rem; margin-top: 30px;
 }
 
-/* Label nhóm */
+/* PATCH_v3: Better Grouping */
 .setting-label {
-    font-size: 0.85rem; font-weight: 700; color: var(--color-text-muted);
-    margin: 20px 0 8px 10px; text-transform: uppercase;
+    font-size: 0.8rem; font-weight: 800; color: #cbd5e1;
+    margin: 30px 0 10px 15px; text-transform: uppercase; letter-spacing: 1px;
 }
 
-/* Container Group */
 .setting-group {
-    background: white; border-radius: 12px; 
-    /* PATCH_v2: Gỡ overflow hidden để body hiện pop-up */
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+    background: white; border-radius: 16px; 
+    box-shadow: 0 4px 6px -2px rgba(0,0,0,0.02); 
+    border: 1px solid #f1f5f9; overflow: hidden;
 }
 
-/* Item dòng */
 .setting-item {
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f8fafc;
     transition: background 0.2s;
 }
 .setting-item:last-child { border-bottom: none; }
 
-/* Header (Phần luôn hiện) */
 .setting-header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 15px; cursor: pointer;
+    padding: 18px 20px; /* Tăng vùng bấm */
+    cursor: pointer;
 }
 .setting-header:active { background-color: #f8fafc; }
 

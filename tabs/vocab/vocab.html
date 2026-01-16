@@ -91,46 +91,36 @@
         <div class="flashcard" id="active-card">
             <div class="card-face card-front">
                 <div class="card-header-row">
-                    <span id="fc-type" class="badge-pos">phrase</span>
+                    <span id="fc-type" class="badge-pos">noun</span>
                     <button id="btn-speak-front" class="btn-audio-sm">🔊</button>
                 </div>
+                
                 <div class="card-body-center">
                     <h2 id="fc-word">Word</h2>
                     <p id="fc-ipa">/ipa/</p>
                 </div>
+
+                <p class="tap-hint">👆 Chạm để lật</p>
             </div>
             
             <div class="card-face card-back">
-                <div class="card-back-header">
-                    <span class="badge-meaning">Định nghĩa & Ngữ cảnh</span>
-                    <button id="btn-speak-back" class="btn-audio-sm">🔊</button>
+                <div class="back-header">
+                    <button id="btn-speak-back" class="btn-audio-sm" style="margin: 0 auto 10px;">🔊</button>
+                    <h3 id="fc-meaning">Nghĩa tiếng Việt</h3>
                 </div>
 
-                <div class="card-back-body">
-                    <h3 id="fc-meaning">Nghĩa tiếng Việt</h3>
-
-                    <div class="mnemonic-box" id="mnemonic-container" style="display: none;">
-                        <span class="ctx-label-mn">💡 Mẹo nhớ nhanh:</span>
+                <div class="back-body">
+                    <div class="mnemonic-bubble" id="mnemonic-container">
                         <span id="fc-mnemonic">...</span>
                     </div>
                     
-                    <div class="divider"></div>
+                    <div class="example-box">
+                        <p id="fc-en" class="ex-en">"Example sentence"</p>
+                        <p id="fc-vi" class="ex-vi">Dịch nghĩa câu ví dụ</p>
+                    </div>
 
-                    <div class="ctx-section">
-                        <div class="ctx-group">
-                             <span class="ctx-label">📌 Collocation:</span>
-                             <div class="ctx-item" style="margin-top: 5px;">
-                                 <p id="fc-collocation" class="ctx-main-text">...</p>
-                             </div>
-                        </div>
-
-                        <div class="ctx-group">
-                             <span class="ctx-label">🗣️ Ví dụ:</span>
-                             <div class="ctx-item" style="margin-top: 5px;">
-                                <p id="fc-en" class="ctx-main-text">"..."</p>
-                                <p id="fc-vi" class="ctx-sub-text">...</p>
-                             </div>
-                        </div>
+                    <div id="collo-box" style="margin-top: 10px; font-size: 0.9rem; color: #64748b;">
+                        📌 <span id="fc-collocation" style="font-weight: 600;">...</span>
                     </div>
                 </div>
             </div>

@@ -100,117 +100,113 @@
 .progress-fill { height:100%; background:var(--color-primary); transition:width 0.3s ease; border-radius:10px; }
 .progress-text { font-size:0.85rem; font-weight:700; color:#64748b; min-width:30px; text-align:right; }
 
-/* PATCH_v3: Redesigned Flashcard UI (Cleaner & Modern) */
+/* PATCH_v4: "Insta-Study" Style - Addictive & Clean */
 
 /* Card Geometry */
 .flashcard-scene {
     flex: 1; perspective: 1200px; 
     display: flex; align-items: center; justify-content: center;
-    padding: 10px 0 30px; /* Thêm khoảng trống bên dưới */
+    padding: 10px 0 20px;
 }
 .flashcard {
-    width: 100%; max-width: 350px; aspect-ratio: 3/4.5; /* Cao hơn một chút */
-    position: relative; transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1); /* Snappier flip */
+    width: 100%; max-width: 360px; aspect-ratio: 9/14; /* Tỷ lệ màn hình điện thoại */
+    position: relative; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform-style: preserve-3d; cursor: pointer;
 }
 .flashcard.is-flipped { transform: rotateY(180deg); }
 
 .card-face {
     position: absolute; width: 100%; height: 100%;
-    backface-visibility: hidden; border-radius: 24px;
+    backface-visibility: hidden; border-radius: 28px;
     display: flex; flex-direction: column;
-    box-shadow: 0 10px 30px -5px rgba(0,0,0,0.08); /* Bóng đổ mềm hơn */
-    background: white; border: 1px solid #f1f5f9;
-    overflow: hidden; /* Để header strip không bị lòi ra */
+    /* Hiệu ứng kính mờ + bóng đổ mềm */
+    background: #ffffff; 
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08), 0 5px 15px rgba(0,0,0,0.05);
+    border: 1px solid rgba(255,255,255,0.8);
+    overflow: hidden;
 }
 
 /* Common Elements */
 .btn-audio-sm { 
-    width: 40px; height: 40px; border-radius: 50%; border:none; 
-    background: #f8fafc; cursor:pointer; color:#64748b; font-size:1.1rem; 
-    transition:0.2s; display: flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: 50%; border:none; 
+    background: #f1f5f9; cursor:pointer; color: #475569; font-size: 1.2rem; 
+    transition: 0.2s; display: flex; align-items: center; justify-content: center;
 }
-.btn-audio-sm:hover { background:#e2e8f0; color:var(--color-primary); }
+.btn-audio-sm:hover { background: #e0f2fe; color: var(--color-primary); transform: scale(1.1); }
 
-/* === FRONT FACE === */
+/* === FRONT FACE (Tối giản tối đa) === */
 .card-front { 
-    padding: 25px; 
-    align-items: center; text-align: center; justify-content: center;
+    align-items: center; justify-content: center; text-align: center;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
 }
-.card-header-row { 
-    width: 100%; display: flex; justify-content: space-between; align-items: center; 
-    position: absolute; top: 20px; left: 0; padding: 0 25px; 
+.card-front .card-header-row {
+    position: absolute; top: 25px; left: 0; width: 100%; 
+    padding: 0 25px; display: flex; justify-content: space-between; align-items: center;
 }
 
+/* Badge Loại từ (Noun/Verb) đẹp hơn */
 .badge-pos { 
-    background: #ecfdf5; color: #059669; /* Màu xanh lá nhẹ nhàng hơn */
-    padding: 6px 14px; border-radius: 20px; 
-    font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    background: #f1f5f9; color: #64748b; 
+    padding: 8px 16px; border-radius: 20px; 
+    font-size: 0.85rem; font-weight: 700; text-transform: uppercase; 
 }
 
-.card-body-center { margin-top: auto; margin-bottom: auto; width: 100%; }
-
-/* Typography Front */
+/* Chữ Siêu To Khổng Lồ */
+.card-body-center { width: 100%; padding: 0 20px; }
 #fc-word { 
-    font-size: clamp(2rem, 6vw, 2.8rem); 
-    font-weight: 800; color: #1e293b; margin-bottom: 15px; 
-    letter-spacing: -0.02em; line-height: 1.2;
+    font-size: clamp(2.5rem, 8vw, 3.5rem); /* Tự động to nhỏ */
+    font-weight: 800; color: #1e293b; margin-bottom: 10px; 
+    letter-spacing: -1px; line-height: 1.1;
+    background: linear-gradient(45deg, #1e293b, #475569);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
 #fc-ipa { 
-    font-family: 'Courier New', monospace; color: #64748b; font-size: 1.2rem; 
-    background: #f1f5f9; padding: 4px 12px; border-radius: 8px; display: inline-block;
+    font-family: 'Courier New', monospace; color: #94a3b8; font-size: 1.3rem; 
+    background: white; padding: 6px 14px; border-radius: 12px; 
+    display: inline-block; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-/* Đã xóa .tap-hint ở đây */
-
-
-/* === BACK FACE (Redesigned) === */
-.card-back { 
-    transform: rotateY(180deg); 
-    text-align: left;
-    padding: 0; /* Reset padding để dùng header strip */
+.tap-hint {
+    position: absolute; bottom: 30px; font-size: 0.9rem; color: #cbd5e1;
+    animation: bounce 2s infinite; font-weight: 500;
 }
 
-/* Header Strip (Dải màu trên cùng) */
-.card-back-header {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6); /* Gradient tím nhẹ */
-    padding: 20px 25px;
-    display: flex; justify-content: space-between; align-items: center;
-    color: white;
-}
-.badge-meaning { font-size:0.8rem; font-weight: 700; text-transform:uppercase; letter-spacing:1px; opacity: 0.9;}
-.card-back-header .btn-audio-sm { background: rgba(255,255,255,0.2); color: white; }
+/* === BACK FACE (Nội dung súc tích) === */
+.card-back { transform: rotateY(180deg); background: white; }
 
-/* Content Body Back */
-.card-back-body {
-    padding: 25px;
-    flex: 1; display: flex; flex-direction: column; gap: 20px;
-    overflow-y: auto; /* Đề phòng nội dung quá dài */
+/* Header Back: Meaning nổi bật */
+.back-header {
+    background: #f8fafc; padding: 25px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: center;
 }
-
 #fc-meaning { 
-    font-size: 1.6rem; font-weight: 800; color: #1e293b;
-    margin: 0; line-height: 1.3;
+    font-size: 1.8rem; font-weight: 800; color: var(--color-primary);
+    margin: 10px 0 0; line-height: 1.2;
 }
 
-/* Mnemonic Box (Mẹo nhớ) */
-.mnemonic-box {
-    background: #fffbeb; border-left: 4px solid #f59e0b; /* Màu vàng */
-    padding: 12px 15px; border-radius: 8px;
-    font-size: 0.95rem; color: #78350f;
+/* Body Back: Mẹo nhớ là ngôi sao */
+.back-body {
+    flex: 1; padding: 20px 25px; 
+    display: flex; flex-direction: column; gap: 15px;
+    overflow-y: auto;
 }
-.ctx-label-mn { font-weight: 700; display: block; margin-bottom: 4px; font-size: 0.8rem; color: #b45309; }
 
-/* Context Section (Collocation & Examples) */
-.ctx-section {
-    display: flex; flex-direction: column; gap: 12px;
+/* Mẹo nhớ Style "Chat Bubble" */
+.mnemonic-bubble {
+    background: #fffbeb; border: 2px solid #fde68a;
+    border-radius: 16px 16px 16px 0;
+    padding: 15px; position: relative;
+    box-shadow: 0 4px 6px -2px rgba(217, 119, 6, 0.1);
 }
-.ctx-label { font-size: 0.8rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;}
+.mnemonic-bubble::before { content: "💡 Mẹo nhớ:"; display: block; font-size: 0.75rem; font-weight: 800; color: #b45309; margin-bottom: 5px; text-transform: uppercase; }
+#fc-mnemonic { font-size: 1rem; color: #78350f; font-weight: 500; line-height: 1.5; }
 
-.ctx-item { border-left: 2px solid #e2e8f0; padding-left: 12px; }
-.ctx-main-text { font-weight: 600; color: #334155; font-size: 1rem; margin-bottom: 4px; }
-.ctx-sub-text { font-size: 0.9rem; color: #64748b; font-style: italic; }
-
-.divider { height:1px; background:#f1f5f9; width: 100%; }
+/* Ví dụ Style tối giản */
+.example-box {
+    border-left: 3px solid #e2e8f0; padding-left: 15px; margin-top: auto;
+}
+.ex-en { font-style: italic; color: #334155; font-size: 1rem; margin-bottom: 4px; }
+.ex-vi { font-size: 0.9rem; color: #94a3b8; }
 
 /* SRS Controls */
 .srs-controls { display: flex; gap: 15px; padding-bottom: 10px; justify-content: center; }

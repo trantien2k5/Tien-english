@@ -219,60 +219,68 @@ export default {
         };
     },
 
-    // PATCH_v3: Fix Crash Null ID
+    // PATCH_v4: Insta-Study Render Logic
     renderCard() {
         const { words, index } = this.playerState;
         if (!words || words.length === 0) return;
         const word = words[index];
         
-        // Helper: Gán text an toàn (tránh crash nếu sai HTML)
         const setText = (id, text) => {
             const el = document.getElementById(id);
             if(el) el.innerText = text || '';
         };
 
-        // Front
+        // 1. FRONT FACE
         setText('fc-word', word.word);
-        setText('fc-ipa', word.ipa);
+        setText('fc-ipa', word.ipa || '');
         setText('fc-type', word.type || 'word');
         
-        // Back
+        // 2. BACK FACE
         setText('fc-meaning', word.meaning);
         
-        // Mẹo nhớ (Check kỹ container)
+        // Mẹo nhớ (Luôn hiển thị placeholder nếu không có để đỡ trống)
         const mnContainer = document.getElementById('mnemonic-container');
         if (mnContainer) {
-            if (word.mnemonic && word.mnemonic.trim() !== '') {
-                setText('fc-mnemonic', word.mnemonic);
-                mnContainer.style.display = 'block';
+             const mnText = (word.mnemonic && word.mnemonic.trim() !== '') 
+                ? word.mnemonic 
+                : "Tưởng tượng một hình ảnh vui nhộn liên quan đến từ này...";
+             setText('fc-mnemonic', mnText);
+             mnContainer.style.display = 'block';
+        }
+        
+        setText('fc-en', word.example_en ? `"${word.example_en}"` : '');
+        setText('fc-vi', word.example_vi || '');
+        
+        // Collocation (Ẩn nếu không có)
+        const colloBox = document.getElementById('collo-box');
+        if(colloBox) {
+            if(word.collocation) {
+                setText('fc-collocation', word.collocation);
+                colloBox.style.display = 'block';
             } else {
-                mnContainer.style.display = 'none';
+                colloBox.style.display = 'none';
             }
         }
         
-        setText('fc-collocation', word.collocation || '...');
-        setText('fc-en', word.example_en ? `"${word.example_en}"` : '');
-        setText('fc-vi', word.example_vi);
-        
-        // Progress
-        const pct = ((index) / words.length) * 100;
+        // 3. PROGRESS BAR (Story Style)
+        const pct = ((index + 1) / words.length) * 100; // Đầy cây khi học xong
         const bar = document.getElementById('player-bar');
         if(bar) bar.style.width = `${pct}%`;
         setText('player-progress', `${index + 1}/${words.length}`);
 
-        // Reset Flip
+        // 4. RESET STATE
         const card = document.getElementById('active-card');
         if (card) {
             card.classList.remove('is-flipped');
             this.playerState.isFlipped = false;
         }
 
-        // Auto Play
+        // 5. AUTO PLAY
         if (this.playerState.autoPlay) {
             this.playAudio();
             setTimeout(() => {
                 if(!this.playerState.isFlipped) this.flipCard();
-            }, 2500);
+            }, 2000);
         }
     },
 
