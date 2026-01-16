@@ -9,30 +9,82 @@
 .dot.learning { background: #f59e0b; }  /* Orange */
 .dot.mastered { background: #10b981; }  /* Green */
 
-/* Flashcard Styles */
-.tag-status {
-    background: #f1f5f9; color: #64748b;
-    padding: 4px 12px; border-radius: 20px;
-    font-size: 0.75rem; text-transform: uppercase; font-weight: bold;
+/* PATCH_v2: New CSS for Topic & Flashcard */
+
+/* --- TOPIC GRID --- */
+.topic-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;
+}
+.topic-card {
+    background: white; border-radius: 16px; padding: 15px;
+    border: 1px solid #e2e8f0; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex; flex-direction: column; justify-content: space-between;
+    height: 140px; position: relative; overflow: hidden;
+}
+.topic-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); border-color: var(--color-primary); }
+.topic-card::before {
+    content: ''; position: absolute; top: -10%; right: -10%; width: 60px; height: 60px;
+    background: linear-gradient(135deg, var(--color-primary), transparent);
+    border-radius: 50%; opacity: 0.1;
+}
+.tc-title { font-weight: 700; font-size: 1.1rem; color: var(--color-text-main); line-height: 1.3; }
+.tc-info { font-size: 0.8rem; color: #94a3b8; margin-top: auto; }
+
+/* --- FLASHCARD SCENE --- */
+.player-container {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: #f8fafc; z-index: 2000;
+    display: flex; flex-direction: column; padding: 20px;
+}
+.player-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; font-weight: 700;
 }
 
-/* Rating Buttons */
-.btn-rate {
-    flex: 1; padding: 10px 5px; border-radius: 8px; border: none;
-    font-weight: 600; cursor: pointer; color: white;
-    transition: transform 0.1s;
+.flashcard-scene {
+    flex: 1; perspective: 1000px; display: flex; align-items: center; justify-content: center;
 }
-.btn-rate:active { transform: scale(0.95); }
-.btn-rate small { font-weight: normal; font-size: 0.7rem; opacity: 0.9; display: block; margin-top: 2px; }
-
-.btn-rate.again { background-color: #ef4444; } /* Red */
-.btn-rate.hard { background-color: #f59e0b; }  /* Orange */
-.btn-rate.good { background-color: #3b82f6; }  /* Blue */
-.btn-rate.easy { background-color: #10b981; }  /* Green */
-
-/* Animation chuyển card */
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(20px); }
-    to { opacity: 1; transform: translateX(0); }
+.flashcard {
+    width: 100%; max-width: 350px; height: 450px;
+    position: relative; transition: transform 0.6s;
+    transform-style: preserve-3d; cursor: pointer;
 }
-.card-anim { animation: slideIn 0.3s ease-out; }
+.flashcard.is-flipped { transform: rotateY(180deg); }
+
+.card-face {
+    position: absolute; width: 100%; height: 100%;
+    backface-visibility: hidden; border-radius: 24px;
+    padding: 30px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05);
+}
+.card-front { background: white; color: var(--color-text-main); }
+.card-back { 
+    background: linear-gradient(135deg, var(--color-primary), #8b5cf6); 
+    color: white; transform: rotateY(180deg); 
+}
+
+/* Card Content */
+#fc-word { font-size: 2.2rem; margin: 15px 0 5px; color: var(--color-primary); }
+#fc-ipa { font-family: monospace; color: #64748b; font-size: 1.1rem; margin-bottom: 10px; }
+.badge-type { background: #eef2ff; color: var(--color-primary); padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; }
+.tap-hint { position: absolute; bottom: 20px; font-size: 0.8rem; color: #cbd5e1; animation: bounce 2s infinite; }
+
+.card-back h3 { font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 10px; width: 100%; }
+.fc-context { font-size: 1rem; line-height: 1.6; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; }
+#fc-en { font-style: italic; margin-bottom: 8px; font-weight: 500; }
+#fc-vi { opacity: 0.9; font-size: 0.9rem; }
+
+/* Controls */
+.player-controls {
+    display: flex; justify-content: center; gap: 20px; margin-top: 20px; padding-bottom: 20px;
+}
+.btn-control {
+    width: 50px; height: 50px; border-radius: 50%; border: none;
+    background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    font-size: 1.2rem; cursor: pointer; transition: 0.2s;
+}
+.btn-control:active { transform: scale(0.9); }
+.btn-control.big { width: 70px; height: 70px; font-size: 1.8rem; background: var(--color-primary); color: white; }
+.loader-box { text-align: center; margin-top: 20px; color: var(--color-text-muted); }

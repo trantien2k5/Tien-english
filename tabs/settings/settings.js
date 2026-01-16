@@ -68,36 +68,34 @@ export default {
         };
     },
 
+    // PATCH_v2
     loadSettings() {
         this.settings = Storage.getSettings();
         
-        // 1. Profile
+        // 1. Profile & Stats
         if(this.els.inpUsername) this.els.inpUsername.value = this.settings.username || 'Student';
         if(this.els.inpLevel) this.els.inpLevel.value = this.settings.level || 'A1';
         if(this.els.inpGoalTarget) this.els.inpGoalTarget.value = this.settings.goalTarget || 'communication';
         
-        // Stats Display
         if(this.els.dispName) this.els.dispName.innerText = this.settings.username || 'Student';
         if(this.els.dispLevel) this.els.dispLevel.innerText = this.settings.level || 'A1';
         if(this.els.dispStreak) this.els.dispStreak.innerText = Storage.getStats().streak || 0;
         
-        // PATCH_v2: Update Goal Info
         const currentMins = parseInt(localStorage.getItem('daily_minutes') || '0');
         if(this.els.dispGoal) this.els.dispGoal.innerText = `🎯 ${currentMins}/${this.settings.dailyGoal || 15}p`;
 
-        // 2. Goal
-        const goal = this.settings.dailyGoal || 15;
-        if(this.els.inpDailySlider) this.els.inpDailySlider.value = goal;
-        if(this.els.valDaily) this.els.valDaily.innerText = goal;
+        // 2. Goal & Vocab
+        if(this.els.inpDailySlider) {
+            this.els.inpDailySlider.value = this.settings.dailyGoal || 15;
+            if(this.els.valDaily) this.els.valDaily.innerText = this.settings.dailyGoal || 15;
+        }
         if(this.els.inpReminder) this.els.inpReminder.checked = !!this.settings.reminderTime;
 
-        // 3. Vocab
         const mode = this.settings.vocabMode || 'balanced';
         this.updateVocabUI(mode);
         this.els.modeBtns.forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
 
-        // 4. Learning & Experience
-        // PATCH_v2
+        // 3. Learning & System
         if(this.els.inpAutoNext) this.els.inpAutoNext.checked = this.settings.autoPlayNext;
         if(this.els.inpShowScript) this.els.inpShowScript.checked = this.settings.showScriptAfter;
         if(this.els.inpAutoReplay) this.els.inpAutoReplay.checked = this.settings.autoReplayWrong;
@@ -108,17 +106,18 @@ export default {
             this.els.inpDarkMode.checked = this.settings.darkMode;
             document.body.classList.toggle('dark-theme', this.settings.darkMode);
         }
-        
         if(this.els.inpSound) this.els.inpSound.checked = this.settings.soundEffects;
-
-        // 5. System
         if(this.els.inpAiMode) this.els.inpAiMode.value = this.settings.aiMode || 'speed';
+
+        // 4. API Key (Sync Fix: Luôn gán giá trị để clear input khi key rỗng)
+        if(this.els.apiKey) this.els.apiKey.value = this.settings.apiKey || '';
+
         if (this.settings.apiKey) {
-            if(this.els.apiKey) this.els.apiKey.value = this.settings.apiKey;
             if(this.els.btnDeleteKey) this.els.btnDeleteKey.style.display = 'block';
             if(this.els.btnSaveKey) this.els.btnSaveKey.innerText = "Cập nhật";
         } else {
             if(this.els.btnDeleteKey) this.els.btnDeleteKey.style.display = 'none';
+            if(this.els.btnSaveKey) this.els.btnSaveKey.innerText = "Lưu Key";
         }
 
         this.renderPreviews();
@@ -157,8 +156,8 @@ export default {
         const obj = {};
         obj[key] = value;
         Storage.saveSettings(obj);
-        this.settings = Storage.getSettings();
-        this.renderPreviews(); // Update UI
+        // Sync Fix: Reload toàn bộ Settings để update cả Header Profile & Input
+        this.loadSettings(); 
     },
 
     bindEvents() {
