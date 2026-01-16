@@ -1,46 +1,23 @@
-import { Storage } from './storage.js';
-// Cấu hình API
-const API_URL = "https://api.openai.com/v1/chat/completions";
+// PATCH_v2
+const API_URL = "/api/chat";
 
 /**
- * Hàm gọi OpenAI API
+ * Hàm gọi AI qua Cloudflare Pages Functions (không lộ API key)
  * @param {string} prompt - Câu hỏi gửi lên
  * @param {string} systemRole - Vai trò của AI
  */
 export async function askAI(prompt, systemRole = "You are a helpful English tutor.") {
-    // ✅ Dùng hàm mới để lấy key an toàn
-    const apiKey = Storage.getApiKey(); 
-    
-    if (!apiKey) {
-        throw new Error("Vui lòng nhập API Key trong phần Settings!");
-    }
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt, systemRole }),
+  });
 
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: "gpt-3.5-turbo",
-                messages: [
-                    { role: "system", content: systemRole },
-                    { role: "user", content: prompt }
-                ],
-                temperature: 0.7
-            })
-        });
+  const data = await response.json();
 
-        if (!response.ok) {
-            const err = await response.json();
-            throw new Error(err.error?.message || "Lỗi kết nối OpenAI");
-        }
+  if (!response.ok) {
+    throw new Error(data?.error?.message || data?.error || "Lỗi AI");
+  }
 
-        const data = await response.json();
-        return data.choices[0].message.content;
-    } catch (error) {
-        console.error("AI Error:", error);
-        throw error;
-    }
+  return data.choices?.[0]?.message?.content || "";
 }
