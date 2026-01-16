@@ -11,11 +11,19 @@ const API_URL = "https://api.openai.com/v1/chat/completions";
 // PATCH_v2
 // PATCH_v2
 // PATCH_v2
+// PATCH_v3: Fix Crash do Key chứa ký tự lạ (Tiếng Việt/Emoji)
 export async function askAI(prompt, systemRole = "You are a helpful English tutor.", returnJson = false) {
-    // ⚠️ QUAN TRỌNG: Thay dòng dưới bằng Link Cloudflare Worker của bạn
     const CLOUDFLARE_WORKER_URL = "https://openai-proxy.trantien.workers.dev"; 
     
-    const personalKey = Storage.getApiKey();
+    let personalKey = Storage.getApiKey();
+    
+    // 🛡️ SECURITY CHECK: Chỉ chấp nhận ký tự ASCII (A-Z, 0-9, ...)
+    // Nếu chứa ký tự lạ (Tiếng Việt, dấu cách ẩn...) -> Coi như không có key
+    if (personalKey && !/^[\x00-\x7F]*$/.test(personalKey)) {
+        console.warn("⚠️ API Key bị bỏ qua vì chứa ký tự không hợp lệ (Non-ASCII).");
+        personalKey = ""; 
+    }
+
     const usePersonalKey = personalKey && personalKey.trim() !== '';
     const endpoint = usePersonalKey ? API_URL : CLOUDFLARE_WORKER_URL;
     
@@ -25,7 +33,7 @@ export async function askAI(prompt, systemRole = "You are a helpful English tuto
 
     try {
         const headers = { "Content-Type": "application/json" };
-        if (usePersonalKey) headers["Authorization"] = `Bearer ${personalKey}`;
+        if (usePersonalKey) headers["Authorization"] = `Bearer ${personalKey.trim()}`;
 
         const response = await fetch(endpoint, {
             method: "POST",
