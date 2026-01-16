@@ -41,28 +41,43 @@ export default {
         });
     },
 
+    // PATCH_v2
     renderDashboard() {
         const grid = document.getElementById('topic-grid');
         if (!grid) return;
+
+        // 1. Update Stats
+        const totalTopics = this.topics.length;
+        const totalWords = this.topics.reduce((acc, t) => acc + (t.words ? t.words.length : 0), 0);
         
-        if (this.topics.length === 0) {
-            grid.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:#94a3b8; margin-top:20px">
-                Chưa có chủ đề nào. Hãy nhờ AI tạo giúp nhé! 🤖
-            </p>`;
+        const statTopics = document.getElementById('stat-topics');
+        const statWords = document.getElementById('stat-words');
+        
+        if(statTopics) statTopics.innerText = totalTopics;
+        if(statWords) statWords.innerText = totalWords;
+
+        // 2. Render Grid
+        if (totalTopics === 0) {
+            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding: 40px 20px;">
+                <div style="font-size:3rem; margin-bottom:10px">📦</div>
+                <p style="color:#94a3b8;">Kho từ vựng trống.<br>Hãy tạo chủ đề đầu tiên!</p>
+            </div>`;
             return;
         }
 
         grid.innerHTML = this.topics.map((t, idx) => `
             <div class="topic-card" onclick="window.openTopic(${idx})">
-                <div class="tc-title">${t.title}</div>
-                <div class="tc-info">
-                    <span>📚 ${t.words.length} từ</span> • 
-                    <span>${t.level}</span>
+                <div class="tc-icon">${t.icon || '📝'}</div>
+                <div class="tc-content">
+                    <div class="tc-title">${t.title}</div>
+                    <div class="tc-meta">
+                        <span>${t.words?.length || 0} từ</span>
+                        <span class="badge-level">${t.level || 'A1'}</span>
+                    </div>
                 </div>
             </div>
         `).join('');
 
-        // Expose function for onclick
         window.openTopic = (idx) => this.startPlayer(this.topics[idx]);
     },
 

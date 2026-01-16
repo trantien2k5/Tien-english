@@ -4,8 +4,38 @@
 </div>
 
 <div id="view-dashboard">
-    <button id="btn-create-topic" class="btn btn--primary mb-2">✨ Tạo chủ đề mới (AI)</button>
-    <div id="topic-grid" class="topic-grid">
+    <div class="vocab-stats-row fade-in">
+        <div class="v-stat-card">
+            <div class="v-icon bg-blue">📚</div>
+            <div class="v-info">
+                <span class="v-val" id="stat-topics">0</span>
+                <span class="v-lbl">Chủ đề</span>
+            </div>
+        </div>
+        <div class="v-stat-card">
+            <div class="v-icon bg-purple">⚡</div>
+            <div class="v-info">
+                <span class="v-val" id="stat-words">0</span>
+                <span class="v-lbl">Từ vựng</span>
+            </div>
+        </div>
+        <div class="v-stat-card">
+            <div class="v-icon bg-green">🔥</div>
+            <div class="v-info">
+                <span class="v-val" id="stat-mastered">0</span>
+                <span class="v-lbl">Đã thuộc</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="vocab-action-area fade-in">
+        <button id="btn-create-topic" class="btn-create-glow">
+            <span class="sparkle">✨</span> Tạo chủ đề mới (AI)
+        </button>
+    </div>
+
+    <h3 class="section-title">Thư viện của bạn</h3>
+    <div id="topic-grid" class="topic-grid fade-in">
         </div>
 </div>
 
@@ -48,7 +78,6 @@
     </div>
 </div>
 
-// PATCH_v2
 <div id="view-player" class="player-container fade-in" style="display: none;">
     <div class="player-top-bar">
         <button id="btn-exit-player" class="btn-icon-close">✕</button>
